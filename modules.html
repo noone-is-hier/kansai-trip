@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>간사이 모듈 도감</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F7F9; --surface:#FFFFFF; --ink:#1C2430; --muted:#5B6675;
+  --accent:#35558E; --accent-soft:#E7EDF6; --warm:#C1502E; --warm-soft:#F7E9E3;
+  --gold:#8A6D2F; --gold-soft:#F3EDDD; --green:#3D6B4F; --green-soft:#E4EFE8;
+  --line:#DDE2EA; --chip:#EEF1F5;
+  --display:'Gowun Batang',Batang,serif; --body:'IBM Plex Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1;
+    --accent:#7C9FD8; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+    --gold:#CBAD62; --gold-soft:#322B1B; --green:#7FB894; --green-soft:#1E2F25;
+    --line:#2A3240; --chip:#232B37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1;
+  --accent:#7C9FD8; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+  --gold:#CBAD62; --gold-soft:#322B1B; --green:#7FB894; --green-soft:#1E2F25;
+  --line:#2A3240; --chip:#232B37;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;font-size:15px}
+.wrap{max-width:920px;margin:0 auto;padding:44px 24px 90px}
+header.hero{padding-bottom:22px;margin-bottom:8px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 10px}
+h1{font-family:var(--display);font-weight:700;font-size:34px;line-height:1.25;margin:0 0 12px;text-wrap:balance}
+.hero p.lede{color:var(--muted);margin:0;max-width:66ch}
+a{color:var(--accent)}
+.backlink{font-size:13px}
+
+/* nav */
+nav.mnav{position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:5;border-bottom:1px solid var(--line);display:flex;gap:7px;flex-wrap:wrap}
+nav.mnav a{font-size:12.5px;font-weight:500;text-decoration:none;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--ink)}
+nav.mnav a:hover{border-color:var(--accent)}
+
+/* summary bar */
+.sumbar{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 18px;margin:20px 0 8px;font-size:13.5px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.sumbar b{font-variant-numeric:tabular-nums}
+.sumbar .picked{color:var(--green);font-weight:700}
+.sumbar .maybe{color:var(--gold);font-weight:700}
+.sumbar .list{color:var(--muted);font-size:12.5px}
+
+/* module card */
+article.mod{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:22px;overflow:hidden;scroll-margin-top:70px}
+.mod>header{padding:16px 20px 12px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.mod>header .tt{flex:1;min-width:220px}
+.mod h3{font-family:var(--display);margin:0 0 4px;font-size:19px}
+.mod h3 .anchor{color:var(--gold);font-size:14px;margin-right:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--chip);color:var(--muted)}
+.chip.cat{background:var(--accent-soft);color:var(--accent)}
+.chip.hot{background:var(--warm-soft);color:var(--warm)}
+.chip.gold{background:var(--gold-soft);color:var(--gold)}
+/* pick toggle */
+.pick{display:flex;gap:5px}
+.pick button{font-family:var(--body);font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--chip);color:var(--muted);border-radius:8px;padding:5px 11px;cursor:pointer}
+.pick button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.mod[data-state="yes"] .pick .b-yes{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.mod[data-state="maybe"] .pick .b-maybe{background:var(--gold-soft);color:var(--gold);border-color:var(--gold)}
+.mod[data-state="no"] .pick .b-no{background:var(--warm-soft);color:var(--warm);border-color:var(--warm)}
+.mod[data-state="no"]{opacity:.55}
+
+.mbody{display:grid;grid-template-columns:1.15fr 1fr;gap:0}
+.mcol{padding:16px 20px}
+.mcol+.mcol{border-left:1px dashed var(--line)}
+.mcol h4{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mcol h4:not(:first-child){margin-top:16px}
+.steps{margin:0;padding-left:18px;font-size:13.5px}
+.steps li{margin:4px 0}
+.kv{font-size:13.5px}
+.kv div{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.kv div:last-child{border-bottom:0}
+.kv b{font-weight:700;color:var(--muted);font-size:12.5px}
+.rev{font-size:13.5px;margin:0;padding-left:0;list-style:none}
+.rev li{margin:5px 0;padding-left:20px;position:relative}
+.rev li.up::before{content:"▲";position:absolute;left:0;color:var(--green);font-size:11px;top:4px}
+.rev li.dn::before{content:"▽";position:absolute;left:0;color:var(--warm);font-size:11px;top:4px}
+.links{font-size:13px;line-height:2}
+@media (max-width:680px){.mbody{grid-template-columns:1fr}.mcol+.mcol{border-left:0;border-top:1px dashed var(--line)}}
+.note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:13px 17px;font-size:13.5px;margin-top:18px}
+footer{margin-top:60px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="hero">
+  <p class="eyebrow">Module Atlas · Kansai 2026.10</p>
+  <h1>간사이 모듈 도감</h1>
+  <p class="lede">모듈을 먼저 판정하고, 기간은 그다음에. 각 모듈 우측 상단의 <b>채택 / 고민 / 제외</b> 버튼은 이 브라우저에 저장됩니다 — 두 분이 각자 찍고 결과를 비교하세요. 사진은 각 모듈의 지도·공식 링크에서 확인 (이 페이지는 외부 이미지를 싣지 않습니다). 배치 규칙과 기간 비교는 <a class="backlink" href="index.html">옵션 보드</a>에.</p>
+</header>
+
+<nav class="mnav">
+  <a href="#usj">⚓USJ</a><a href="#keiba">⚓대상전</a><a href="#kyoto-east">교토 동부</a><a href="#kyoto-west">교토 서북</a><a href="#uji">우지</a><a href="#nara">나라</a><a href="#kobe">고베</a><a href="#arima">아리마·롯코</a><a href="#osaka">오사카 랜드마크</a><a href="#kaiyukan">카이유칸</a><a href="#dotonbori">도톤보리 나이트</a><a href="#nightview">야경</a><a href="#sonoda">소노다(예비)</a>
+</nav>
+
+<div class="sumbar" id="sumbar">판정 현황 — <span class="picked">채택 <b id="cnt-yes">0</b></span> <span class="maybe">고민 <b id="cnt-maybe">0</b></span> <span>제외 <b id="cnt-no">0</b></span> <span class="list" id="picklist"></span></div>
+
+<!-- ============ USJ ============ -->
+<article class="mod" id="usj" data-mod="usj">
+  <header>
+    <div class="tt"><h3><span class="anchor">⚓</span>유니버셜 스튜디오 재팬</h3>
+    <div class="chips"><span class="chip cat">앵커 · 풀데이</span><span class="chip hot">체력 최상</span><span class="chip">평일 화~목</span><span class="chip gold">할로윈 호러 나이트 시즌</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>백본 동선</h4>
+      <ol class="steps">
+        <li>공식 오픈 75분 전 도착 → 조기 개장 입장</li>
+        <li>첫 타: 플라잉 다이너소어 (아침이 대기 최소)</li>
+        <li>닌텐도 월드 — 마리오카트 → 동키콩 → 파워업 밴드 미니게임</li>
+        <li>늦은 오후 해리포터 — 해질녘 호그와트 + 포비든 저니</li>
+        <li>일몰 후 거리 좀비(분위기만) → 야간 할리우드 드림 백드롭 마무리</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>난바 → JR 유니버설시티 약 30분 (니시쿠조 환승)</span></div>
+        <div><b>비용</b><span>입장권 ¥8,000~9,000대 + 익스프레스 패스7 ~¥21,800 (날짜 변동제)</span></div>
+        <div><b>예약</b><span>익스프레스 패스는 날짜지정·수량제 — 매진 전 구매가 이 여행 전체의 1순위</span></div>
+        <div><b>필수 앱</b><span>USJ 공식 앱 (대기시간·e정리권)</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">닌텐도 월드·야간 코스터는 "돈값 이상" 평이 지배적</li>
+        <li class="up">할로윈 시즌 야간 분위기(좀비 거리)는 호불호 없이 호평</li>
+        <li class="dn">패스 없이 간 후기의 절반은 "줄 서다 하루 끝" — 패스 유무가 만족도를 가름</li>
+        <li class="dn">파크 내 식사는 가격 대비 평범하다는 평 다수 — 기대치 조절</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.usj.co.jp/web/ko/kr" target="_blank" rel="noopener">공식(한국어) — 티켓·패스</a><br>
+        <a href="https://www.usj.co.jp/web/ko/kr/events/halloween-extreme-autumn-2026/halloween-horror-nights" target="_blank" rel="noopener">할로윈 호러 나이트 2026</a><br>
+        <a href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Keiba ============ -->
+<article class="mod" id="keiba" data-mod="keiba">
+  <header>
+    <div class="tt"><h3><span class="anchor">⚓</span>교토대상전 GII — 교토경마장</h3>
+    <div class="chips"><span class="chip cat">앵커 · 오후 반나절</span><span class="chip">체력 중</span><span class="chip gold">10/4(일) 고정</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>오후 모듈 동선</h4>
+      <ol class="steps">
+        <li>13시경 입장 (지정석 사전 구매 — 자리 쟁탈전 회피)</li>
+        <li>패독에서 출주마 관찰 → 마권 발매기 체험 (최소 ¥100)</li>
+        <li>15시대 메인 교토대상전 직관 — 발주~직선의 함성이 본체</li>
+        <li>여운으로 한 경주 더 → 17시 전 이탈, 시내 복귀</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>오사카 → 게이한 요도역 40분+ · 역에서 연결통로 직결</span></div>
+        <div><b>비용</b><span>입장 ¥200 + 지정석 수천 엔대 · 마권은 1인 ¥1,000 상한 권장</span></div>
+        <div><b>예약</b><span>JRA 지정석 인터넷 예약 — GII 일요일은 조기 마감 주의</span></div>
+        <div><b>규칙</b><span>마권 구매는 현금 · 20세 이상</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">2023년 리뉴얼 후 "공원+스타디움" — 비팬 동반 방문 호평</li>
+        <li class="up">메인 레이스 함성은 경마 몰라도 소름이라는 평이 정석</li>
+        <li class="dn">중상일 혼잡 — 자유석·패독 앞줄은 오전부터 경쟁 (지정석으로 해결)</li>
+        <li class="dn">경주 간 30분 간격이 지루하다는 평 — 장내 먹거리·시설 탐방으로 채우기</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.jra.go.jp/facilities/race/kyoto/" target="_blank" rel="noopener">교토경마장 공식 (JRA)</a><br>
+        <a href="https://maps.google.com/?q=Kyoto+Racecourse" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Kyoto East ============ -->
+<article class="mod" id="kyoto-east" data-mod="kyoto-east">
+  <header>
+    <div class="tt"><h3>교토 동부 — 골든 루트</h3>
+    <div class="chips"><span class="chip cat">풀데이</span><span class="chip hot">체력 상</span><span class="chip">평일 권장</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>남→북 동선</h4>
+      <ol class="steps">
+        <li>07시대 출발 — JR 이나리역: <b>후시미이나리</b> 아침 참배 (중턱 요츠츠지까지)</li>
+        <li>기요미즈데라 → 산넨자카·니넨자카 기와 골목</li>
+        <li>점심 — 기온·가와라마치 or 니시키 시장 주전부리</li>
+        <li>오후 — 기온 하나미코지 산책, 여유 시 은각사·철학의 길</li>
+        <li>저녁 — 폰토초 골목 식사 → 한큐/JR 복귀</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>오사카역 → JR 신쾌속 약 30분(¥580) / 한큐 우메다 → 가와라마치 ¥410</span></div>
+        <div><b>비용</b><span>후시미이나리 무료 · 기요미즈 ~¥500 · 나머지는 걷기</span></div>
+        <div><b>예약</b><span>불필요 — 폰토초 저녁만 1곳 예약해두면 완벽</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">이른 아침 후시미이나리는 "여행 전체의 최고 장면" 단골</li>
+        <li class="up">산넨자카 골목 자체가 기요미즈보다 좋았다는 평 다수</li>
+        <li class="dn">10시 이후 기요미즈 일대는 인파로 도보 정체 — 아침 승부 필수</li>
+        <li class="dn">"하루에 다 넣으면 발이 죽는다" — 은각사는 과감히 버리는 게 다수파</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://inari.jp/" target="_blank" rel="noopener">후시미이나리 공식</a> · <a href="https://www.kiyomizudera.or.jp/" target="_blank" rel="noopener">기요미즈데라 공식</a><br>
+        <a href="https://maps.google.com/?q=Fushimi+Inari+Taisha" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Kyoto West ============ -->
+<article class="mod" id="kyoto-west" data-mod="kyoto-west">
+  <header>
+    <div class="tt"><h3>교토 서북 — 아라시야마·금각사</h3>
+    <div class="chips"><span class="chip cat">풀데이</span><span class="chip hot">체력 상</span><span class="chip">평일 권장 · 교토 2차 카드</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>아침 — 아라시야마 대나무숲 (8시 전이 승부) → 도게츠교 강변</li>
+        <li>옵션 — 몽키파크(산 위 원숭이 + 시가 전망) or 텐류지 정원</li>
+        <li>점심 — 아라시야마 상점가 (두부·소바)</li>
+        <li>오후 — 금각사 → 료안지 돌정원 → 니조성</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>한큐/JR로 아라시야마 · 구간 이동은 버스·택시 병용이 효율</span></div>
+        <div><b>비용</b><span>금각사 ~¥500 · 니조성 ~¥800 · 대나무숲 무료</span></div>
+        <div><b>비고</b><span>동부보다 이동량 많음 — 하루 2만 보 각오</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">금각사는 "사진 그대로라 실망할 수 없는 곳"</li>
+        <li class="up">니조성 나이팅게일 마루·장벽화는 기대 없이 갔다 만족하는 패턴</li>
+        <li class="dn">대나무숲은 짧다(10분) — "그거 보러 아라시야마까지?"는 흔한 실망, 강변·정원과 세트로 봐야 성립</li>
+        <li class="dn">버스 이동 구간이 관광객으로 만원 — 택시 짧게 끊는 게 정신건강</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.shokoku-ji.jp/kinkakuji/" target="_blank" rel="noopener">금각사 공식</a> · <a href="https://nijo-jocastle.city.kyoto.lg.jp/" target="_blank" rel="noopener">니조성 공식</a><br>
+        <a href="https://maps.google.com/?q=Arashiyama+Bamboo+Grove" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Uji ============ -->
+<article class="mod" id="uji" data-mod="uji">
+  <header>
+    <div class="tt"><h3>우지 — 말차의 본고장</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 중</span><span class="chip">평일 오전 · 교토 동부와 노선축 공유</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>뵤도인 — 10엔 동전의 봉황당, 연못 반영</li>
+        <li>오모테산도 상점가 — 말차소바 점심, 말차 파르페</li>
+        <li>우지가와 강변 산책 → 우지가미 신사(세계유산, 한적)</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>교토역 → JR 나라선 ~20분 · 후시미이나리와 같은 노선</span></div>
+        <div><b>비용</b><span>뵤도인 ~¥700 (봉황당 내부는 별도 정리권)</span></div>
+        <div><b>비고</b><span>교토 동부를 아침에 압축하면 오후 우지로 이을 수 있음</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">"교토 시내의 절반 인파, 두 배의 여유" — 한적함이 최대 상품</li>
+        <li class="up">말차 디저트는 시내 체인과 격이 다르다는 평</li>
+        <li class="dn">스팟 수 자체는 적음 — 꽉 찬 관광을 원하면 심심할 수 있음</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.byodoin.or.jp/" target="_blank" rel="noopener">뵤도인 공식</a><br>
+        <a href="https://maps.google.com/?q=Byodoin+Uji" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Nara ============ -->
+<article class="mod" id="nara" data-mod="nara">
+  <header>
+    <div class="tt"><h3>나라 — 사슴과 대불</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 중</span><span class="chip">주말도 무난 · 오전 출발</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>긴테츠나라역 → 도보 5분이면 사슴이 등장</li>
+        <li>나라공원 — 사슴전병(¥200) 주며 인사하는 사슴 체험</li>
+        <li>도다이지 — 세계 최대급 목조 대불전 + 15m 청동 대불</li>
+        <li>귀로 상점가 — 나카타니도 고속 떡메치기 + 요모기 모찌</li>
+        <li>(확장 시) 가스가타이샤 석등 참배길 + 나라마치 골목</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>오사카난바 → 긴테츠 급행 약 40분 (~¥680)</span></div>
+        <div><b>비용</b><span>공원 무료 · 도다이지 대불전 ~¥800 · 전병 ¥200</span></div>
+        <div><b>주의</b><span>사슴은 오전이 온순 · 10월은 발정기 시작 — 수사슴 거리 유지 · 전병은 숨겨서 이동</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">"인사하는 사슴"은 커플·가족 만족도 최상위 단골</li>
+        <li class="up">대불은 사진보다 실물 — 크기 체감에 다들 놀라는 패턴</li>
+        <li class="dn">사슴에게 옷·지도 물린 후기 다수 — 귀엽지만 야생동물</li>
+        <li class="dn">반나절이면 충분해서 "하루 다 쓰면 늘어진다"가 중론</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.todaiji.or.jp/" target="_blank" rel="noopener">도다이지 공식</a> · <a href="https://www.visitnara.jp/" target="_blank" rel="noopener">나라현 관광 공식</a><br>
+        <a href="https://maps.google.com/?q=Nara+Park" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Kobe ============ -->
+<article class="mod" id="kobe" data-mod="kobe">
+  <header>
+    <div class="tt"><h3>고베 시내 — 기타노와 항구</h3>
+    <div class="chips"><span class="chip cat">반나절~풀데이</span><span class="chip">체력 중</span><span class="chip">주말도 무난</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>오전 — 기타노이진칸 (개항기 양관 거리, 내부는 2~3관만)</li>
+        <li>내려오며 구거류지 근대 건축 산책</li>
+        <li>점심 — <b>고베규 철판 런치</b> (디너의 절반값, 인기점 예약)</li>
+        <li>난킨마치 차이나타운 — 로쇼키 부타망 간식</li>
+        <li>해질녘 — 메리켄파크 포트타워 → 하버랜드 모자이크 야경</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>오사카역 → JR 신쾌속 산노미야 약 21분 / 한큐·한신 ¥330 전후</span></div>
+        <div><b>비용</b><span>고베규 런치 ¥6,000대~ · 나머지는 도보 무료권</span></div>
+        <div><b>예약</b><span>고베규 인기점은 구글맵·타베로그로 사전 예약 권장</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">고베규 런치는 "이 여행 최고의 한 끼" 단골 — 카운터 철판 쇼 포함</li>
+        <li class="up">도시 자체가 컴팩트 — 도보로 다 이어져 이동 스트레스 적음</li>
+        <li class="dn">기타노 양관 내부는 "입장료 대비 평범" 평 — 거리 분위기가 본체</li>
+        <li class="dn">교토·오사카 대비 "한 방"은 약하다는 평 — 온천·야경과 묶어야 완성</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.kobeijinkan.com/" target="_blank" rel="noopener">기타노이진칸 공식</a><br>
+        <a href="https://maps.google.com/?q=Kitano+Ijinkan+Kobe" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Arima ============ -->
+<article class="mod" id="arima" data-mod="arima">
+  <header>
+    <div class="tt"><h3>아리마·롯코 — 온천과 야경</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 하 · 회복</span><span class="chip gold">USJ 전날 최적</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>경치 코스 (고베 시내에서 이어서)</h4>
+      <ol class="steps">
+        <li>롯코 케이블카로 산정 — 간사이 전망</li>
+        <li>롯코-아리마 로프웨이로 하산 (막차 17시대 확인 필수)</li>
+        <li>아리마 — 킨노유(철분 붉은 금탕) or 긴노유(탄산 은탕) 당일 입욕</li>
+        <li>온천가 골목 — 탄산센베이 + 탄산수 원천</li>
+        <li>신테츠 → 타니가미 환승 → 산노미야 약 45분 복귀</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>비용</b><span>당일 입욕 ¥650~800 · 케이블+로프웨이 별도</span></div>
+        <div><b>준비물</b><span>불필요 — 수건 대여 가능, 빈손 온천</span></div>
+        <div><b>지름길</b><span>시간 없으면 산노미야 → 신테츠 직행 약 45분</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">"일본 3대 고탕" 금탕의 진한 철분물은 확실한 차별점</li>
+        <li class="up">여행 중반 온천 반나절이 "일정 전체를 살렸다"는 회고 다수</li>
+        <li class="dn">료칸 숙박 없이 당일 입욕만이면 마을 자체는 1~2시간 거리</li>
+        <li class="dn">로프웨이 막차를 놓쳐 우회 귀환한 후기가 잊을 만하면 등장</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://arimaspa-kingin.jp/" target="_blank" rel="noopener">킨노유·긴노유 공식</a> · <a href="https://www.rokkosan.com/" target="_blank" rel="noopener">롯코산 공식</a><br>
+        <a href="https://maps.google.com/?q=Arima+Onsen" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Osaka landmark ============ -->
+<article class="mod" id="osaka" data-mod="osaka">
+  <header>
+    <div class="tt"><h3>오사카 랜드마크 — 성·시장·신세카이</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 중</span><span class="chip">아무 슬롯이나 · 쪼개기 가능</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선 (통짜 또는 2~3조각으로 분해)</h4>
+      <ol class="steps">
+        <li>오사카성 — 개장 직후 천수각 + 해자 산책</li>
+        <li>구로몬 시장 — 참치·성게·와규 꼬치 서서 먹기 (아침~점심 한정)</li>
+        <li>신세카이 — 츠텐카쿠 아래 쿠시카츠 (소스 두 번 찍기 금지)</li>
+        <li>남는 조각은 다른 날 오전·오후에 배분 가능</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>전부 지하철 미도스지·타니마치선 권역</span></div>
+        <div><b>비용</b><span>천수각 ~¥600 · 시장은 먹는 만큼</span></div>
+        <div><b>패스</b><span>주유패스는 이 모듈+야경을 하루에 몰 때만 본전</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">구로몬 아침 식도락은 "숙취에도 일어나게 되는 곳"</li>
+        <li class="up">신세카이 레트로 골목은 사진이 잘 나온다는 평</li>
+        <li class="dn">천수각 내부(박물관)는 "외관이 전부" 평 다수 — 공원·해자가 본체</li>
+        <li class="dn">구로몬 오후는 문 닫는 집 많아 실망 후기 — 오전 필수</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.osakacastle.net/" target="_blank" rel="noopener">오사카성 공식</a> · <a href="https://kuromon.com/" target="_blank" rel="noopener">구로몬 시장 공식</a><br>
+        <a href="https://maps.google.com/?q=Osaka+Castle" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Kaiyukan ============ -->
+<article class="mod" id="kaiyukan" data-mod="kaiyukan">
+  <header>
+    <div class="tt"><h3>카이유칸 — 우천 스왑 카드</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 하</span><span class="chip hot">비 오는 날 아무 모듈과 교체</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>세계 최대급 수조의 고래상어 — 나선형으로 내려가는 단일 동선</li>
+        <li>해달·펭귄·해파리관</li>
+        <li>옆 덴포잔 대관람차 (맑으면) + 텐포잔 마켓플레이스 식사</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>이동</b><span>지하철 츄오선 오사카코역 도보 5분</span></div>
+        <div><b>비용</b><span>~¥2,700 (날짜 변동제) · 온라인 사전 구매 시 입장 원활</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">고래상어 수조 앞은 "시간 녹는 곳" — 어른 만족도도 높음</li>
+        <li class="dn">주말·방학은 유모차 인파 — 평일 우천 카드로 쓸 때 최강</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.kaiyukan.com/" target="_blank" rel="noopener">카이유칸 공식</a><br>
+        <a href="https://maps.google.com/?q=Osaka+Aquarium+Kaiyukan" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Dotonbori ============ -->
+<article class="mod" id="dotonbori" data-mod="dotonbori">
+  <header>
+    <div class="tt"><h3>도톤보리 나이트 — 매일 밤의 기본값</h3>
+    <div class="chips"><span class="chip cat">저녁 모듈</span><span class="chip">체력 하</span><span class="chip">숙소가 난바면 "일정"이 아니라 "일상"</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>구성 요소 (매일 다르게 조합)</h4>
+      <ol class="steps">
+        <li>글리코 사인 + 강변 네온 산책</li>
+        <li>타코야키·오코노미야키·라멘 순례 (하루 하나씩)</li>
+        <li>돈키호테·드럭스토어 쇼핑 (면세 줄은 밤에 김 — 초저녁에)</li>
+        <li>신사이바시스지 아케이드 → 아메리카무라 (빈티지 취향 시)</li>
+      </ol>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">"밤마다 조금씩"이 하루 몰아치기보다 만족도 높다는 게 중론</li>
+        <li class="dn">주말 밤 글리코 사인 앞은 인증샷 인파 — 평일 밤이 쾌적</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://maps.google.com/?q=Dotonbori" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Night view ============ -->
+<article class="mod" id="nightview" data-mod="nightview">
+  <header>
+    <div class="tt"><h3>야경 전망대 — 우메다 vs 하루카스 택1</h3>
+    <div class="chips"><span class="chip cat">저녁 모듈</span><span class="chip">체력 하</span><span class="chip">갠 날 하루 배정</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>비교</h4>
+      <div class="kv">
+        <div><b>우메다</b><span>스카이빌딩 공중정원 — 옥상 개방형 링, 바람 맞는 야경 (~¥2,000)</span></div>
+        <div><b>하루카스</b><span>하루카스300 — 일본 최고층 300m 전면 유리 (~¥2,000)</span></div>
+        <div><b>판단</b><span>개방감·건축은 우메다, 높이·안락함은 하루카스 — 숙소에서 가까운 쪽이 정답이라는 평도</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">둘 다 "일몰 30분 전 입장"이 만점 공식 (일몰~야경 전환을 한 번에)</li>
+        <li class="dn">둘 다 가면 감흥 반감 — 하나만 제대로가 중론</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.skybldg.co.jp/" target="_blank" rel="noopener">우메다 스카이빌딩 공식</a> · <a href="https://www.abenoharukas-300.jp/" target="_blank" rel="noopener">하루카스300 공식</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ============ Sonoda ============ -->
+<article class="mod" id="sonoda" data-mod="sonoda">
+  <header>
+    <div class="tt"><h3>소노다 경마 — 예비 카드</h3>
+    <div class="chips"><span class="chip cat">반나절</span><span class="chip">체력 하</span><span class="chip">10/8(목) 주간 · 대상전 무산 시 백업</span></div></div>
+    <div class="pick"><button class="b-yes">채택</button><button class="b-maybe">고민</button><button class="b-no">제외</button></div>
+  </header>
+  <div class="mbody">
+    <div class="mcol">
+      <h4>동선</h4>
+      <ol class="steps">
+        <li>한큐 우메다 → 소노다역 약 10분 → 도보 12분/무료 셔틀</li>
+        <li>패독·결승선이 다 가까운 초소형 트랙 — 2~3경주만 보고 이탈 가능</li>
+        <li>장내 쿠시카츠·우동으로 서민 경마장 정취</li>
+      </ol>
+      <h4>실전 정보</h4>
+      <div class="kv">
+        <div><b>비용</b><span>입장 수백 엔 · 마권 현금 ¥100부터</span></div>
+        <div><b>개최</b><span>10/7(수)·8(목) 주간 — 나이터는 10/9(금)이라 D·B7 프레임에선 불가</span></div>
+      </div>
+    </div>
+    <div class="mcol">
+      <h4>후기에서 자주 갈리는 지점</h4>
+      <ul class="rev">
+        <li class="up">"말이 이렇게 가까이" — 거리감은 JRA가 못 주는 경험</li>
+        <li class="dn">평일 주간은 한산+연령대 높음 — 축제 분위기를 기대하면 오산</li>
+      </ul>
+      <h4>링크</h4>
+      <div class="links">
+        <a href="https://www.sonoda-himeji.jp/" target="_blank" rel="noopener">소노다·히메지 경마 공식</a><br>
+        <a href="https://maps.google.com/?q=Sonoda+Racecourse" target="_blank" rel="noopener">지도·사진 (Google Maps)</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<div class="note"><b>사용법:</b> 두 분이 각자 이 페이지를 열어 판정을 찍고(각자의 브라우저에 저장됨), "채택" 목록을 서로 읽어주면 그게 곧 일정 협상 테이블이 됩니다. 채택 모듈 수가 프레임 용량(D=풀데이 4+반나절 2 / B7=+여유일 1)을 넘으면 그때 기간을 늘리거나 모듈을 자르면 됩니다 — 기간보다 모듈이 먼저.</div>
+
+<footer>2026.08.30 · 모듈 도감 v1 · 요금·운영시간은 예약 시점에 공식 링크로 재확인 · 배치 규칙·기간 비교는 <a href="index.html">옵션 보드</a></footer>
+</div>
+
+<script>
+(function(){
+  var KEY='kansai-module-picks';
+  var picks={};
+  try{picks=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){picks={};}
+  var mods=document.querySelectorAll('article.mod');
+  var names={usj:'USJ',keiba:'교토대상전','kyoto-east':'교토동부','kyoto-west':'교토서북',uji:'우지',nara:'나라',kobe:'고베',arima:'아리마·롯코',osaka:'오사카랜드마크',kaiyukan:'카이유칸',dotonbori:'도톤보리',nightview:'야경',sonoda:'소노다'};
+  function render(){
+    var y=0,m=0,n=0,yl=[];
+    mods.forEach(function(mod){
+      var id=mod.getAttribute('data-mod');
+      var st=picks[id]||'';
+      if(st) mod.setAttribute('data-state',st); else mod.removeAttribute('data-state');
+      if(st==='yes'){y++;yl.push(names[id]||id);}
+      else if(st==='maybe'){m++;}
+      else if(st==='no'){n++;}
+    });
+    document.getElementById('cnt-yes').textContent=y;
+    document.getElementById('cnt-maybe').textContent=m;
+    document.getElementById('cnt-no').textContent=n;
+    document.getElementById('picklist').textContent=yl.length?('채택: '+yl.join(' · ')):'';
+  }
+  mods.forEach(function(mod){
+    var id=mod.getAttribute('data-mod');
+    var map={'b-yes':'yes','b-maybe':'maybe','b-no':'no'};
+    Object.keys(map).forEach(function(cls){
+      var btn=mod.querySelector('.'+cls);
+      if(!btn) return;
+      btn.addEventListener('click',function(){
+        picks[id]=(picks[id]===map[cls])?'':map[cls];
+        try{localStorage.setItem(KEY,JSON.stringify(picks));}catch(e){}
+        render();
+      });
+    });
+  });
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>간사이 옵션 보드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F7F9; --surface:#FFFFFF; --ink:#1C2430; --muted:#5B6675;
+  --accent:#35558E; --accent-soft:#E7EDF6; --warm:#C1502E; --warm-soft:#F7E9E3;
+  --gold:#8A6D2F; --gold-soft:#F3EDDD;
+  --line:#DDE2EA; --chip:#EEF1F5;
+  --display:'Gowun Batang',Batang,serif; --body:'IBM Plex Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1;
+    --accent:#7C9FD8; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+    --gold:#CBAD62; --gold-soft:#322B1B;
+    --line:#2A3240; --chip:#232B37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1;
+  --accent:#7C9FD8; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+  --gold:#CBAD62; --gold-soft:#322B1B;
+  --line:#2A3240; --chip:#232B37;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 24px 90px}
+header.hero{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:34px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 10px}
+h1{font-family:var(--display);font-weight:700;font-size:34px;line-height:1.25;margin:0 0 12px;text-wrap:balance}
+.hero p.lede{color:var(--muted);margin:0;max-width:66ch}
+h2{font-family:var(--display);font-size:22px;margin:56px 0 4px}
+h2 .sec{color:var(--muted);font-size:13px;font-family:var(--body);font-weight:400;margin-left:8px}
+h2 + p.sub{color:var(--muted);margin:0 0 18px;font-size:14px;max-width:76ch}
+
+/* ---------- calendar strip ---------- */
+.calbox{overflow-x:auto;margin-top:16px}
+.cal{display:grid;grid-template-columns:repeat(10,minmax(88px,1fr));gap:6px;min-width:940px}
+.cal .cell{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 10px 12px;display:flex;flex-direction:column;gap:6px}
+.cal .cell.wknd{background:var(--chip)}
+.cal .d{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px}
+.cal .d small{color:var(--muted);font-weight:400;margin-left:4px}
+.cal .ev{font-size:11.5px;line-height:1.4;border-radius:5px;padding:2px 7px;font-weight:500}
+.ev.race{background:var(--gold-soft);color:var(--gold)}
+.ev.usj{background:var(--accent-soft);color:var(--accent)}
+.ev.hol{background:var(--warm-soft);color:var(--warm)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend .l1 i{background:var(--gold)}.legend .l2 i{background:var(--accent)}.legend .l3 i{background:var(--warm)}
+
+/* ---------- frame cards ---------- */
+.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.frame h3{margin:0;font-size:16px;display:flex;align-items:baseline;gap:8px}
+.frame h3 .k{font-family:var(--display);color:var(--accent);font-size:17px}
+.frame .range{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.bar{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
+.bar i{height:8px;border-radius:2px;background:var(--chip)}
+.bar i.on{background:var(--accent)}
+.bar i.half{background:linear-gradient(90deg,var(--chip) 50%,var(--accent) 50%)}
+.frame ul{margin:0;padding-left:16px;font-size:13.5px}
+.frame li{margin:3px 0}
+.frame .meta{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--chip);color:var(--muted)}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.warn{background:var(--warm-soft);color:var(--warm)}
+.pill.gold{background:var(--gold-soft);color:var(--gold)}
+
+/* ---------- option rows ---------- */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin-top:16px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:8px}
+.opt .tag{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+.opt .tag.warm{color:var(--warm)}
+.opt h3{margin:0;font-size:15.5px}
+.opt p{margin:0;font-size:13px;color:var(--muted)}
+.opt ul{margin:0;padding-left:15px;font-size:13.5px}
+.opt li{margin:3px 0}
+.opt .foot{margin-top:auto;border-top:1px dashed var(--line);padding-top:8px;font-size:12.5px;color:var(--muted)}
+.opt .foot b{color:var(--ink)}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+.tablebox{overflow-x:auto}
+th{text-align:left;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .y{color:var(--accent);font-weight:700}
+td .n{color:var(--muted)}
+
+/* ---------- parallel tracks ---------- */
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;margin-top:18px}
+.track{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.track>h3{font-family:var(--display);margin:0 0 2px;font-size:18px;color:var(--accent)}
+.track .tsub{font-size:12.5px;color:var(--muted);margin:0 0 6px}
+.trow{display:grid;grid-template-columns:66px 1fr;gap:10px;padding:10px 0;border-top:1px dashed var(--line);font-size:13.5px;line-height:1.5}
+.trow .td{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px}
+.trow .td small{display:block;color:var(--muted);font-weight:400;font-size:11.5px}
+.trow .tc .pill{margin-left:4px;vertical-align:1px}
+.trow .alt{color:var(--muted);font-size:12.5px;margin-top:3px}
+.trow .alt b{color:var(--ink)}
+
+.note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:13px 17px;font-size:13.5px;margin-top:16px}
+.note.warm{border-left-color:var(--warm)}
+footer{margin-top:60px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="hero">
+  <p class="eyebrow">Options Board · 2026.10</p>
+  <h1>간사이 옵션 보드</h1>
+  <p class="lede">출발 10/2(금) 밤 ~ 복귀 10/11(일) 사이, 박수 미정. 기간 선정 기준은 <b>총비용과 쾌적도</b> — 예산 상한 1인 200만 원(항공·숙박·USJ·현지 경비 전부 포함, 쇼핑 별도). 고정 앵커는 둘뿐 — <b>USJ 1일 + 경마 1회</b>. 나머지 슬롯은 전부 가변. 슬롯마다 옵션을 나란히 놓고 둘이서 고르는 보드.</p>
+</header>
+
+<!-- ========== 0. calendar ========== -->
+<section>
+  <h2>고정 팩트 캘린더<span class="sec">모든 옵션의 공통 전제</span></h2>
+  <p class="sub">개천절(10/3 토)의 대체공휴일이 10/5(월), 한글날이 10/9(금). 근무·재택은 제약이 아니므로, 이 캘린더에서 공휴일 표시는 <b>혼잡도 신호</b>로만 읽으면 된다: 한국 연휴(10/3~5)와 일본 연휴(10/10~12)가 양끝의 혼잡 파도, 10/6(화)~10/9(금)이 조용한 코어.</p>
+  <div class="calbox"><div class="cal">
+    <div class="cell"><span class="d">10.02<small>금</small></span><span class="ev usj">밤 출발 가능선</span><span class="ev hol">연휴 전야 러시</span></div>
+    <div class="cell wknd"><span class="d">10.03<small>토</small></span><span class="ev hol">개천절 · 韓연휴</span></div>
+    <div class="cell wknd"><span class="d">10.04<small>일</small></span><span class="ev race">교토대상전 GII</span><span class="ev hol">韓연휴</span></div>
+    <div class="cell"><span class="d">10.05<small>월</small></span><span class="ev hol">대체공휴일</span></div>
+    <div class="cell"><span class="d">10.06<small>화</small></span><span class="ev usj">조용한 코어</span></div>
+    <div class="cell"><span class="d">10.07<small>수</small></span><span class="ev usj">USJ 기본값</span><span class="ev race">소노다 주간</span></div>
+    <div class="cell"><span class="d">10.08<small>목</small></span><span class="ev usj">조용한 코어</span><span class="ev race">소노다 주간</span></div>
+    <div class="cell"><span class="d">10.09<small>금</small></span><span class="ev race">소노다 나이터</span><span class="ev hol">한글날</span></div>
+    <div class="cell wknd"><span class="d">10.10<small>토</small></span><span class="ev race">JRA 교토 개막</span><span class="ev hol">日연휴 시작</span></div>
+    <div class="cell wknd"><span class="d">10.11<small>일</small></span><span class="ev race">JRA 교토</span><span class="ev hol">양국 연휴 절정</span></div>
+  </div></div>
+  <div class="legend"><span class="l1"><i></i>경마</span><span class="l2"><i></i>고정 일정·근무</span><span class="l3"><i></i>공휴일·연휴</span><span>· USJ 할로윈 호러 나이트는 전 기간 해당(9/11–11/8)</span></div>
+  <div class="note"><b>USJ 요일 서열 (전부 가변 전제):</b> ① 10/6(화)·7(수)·8(목) — 평일 3형제, 최선 ② 10/9(금·한글날) — 한국인 방문 증가 ③ 10/5(월) — 한국 연휴 마지막날 ④ 10/4(일)·10/10(토)~ — 주말+일본 연휴, 회피. 재택이 필요해지면 어느 평일이든 "가벼운 날"로 전환 가능하다는 것만 기억.</div>
+</section>
+
+<!-- ========== 1. frames ========== -->
+<section>
+  <h2>① 기간 프레임 — 4안 × 비용 × 쾌적도<span class="sec">막대 = 10/2~11 중 체류 구간</span></h2>
+  <p class="sub">이 창은 <b>양끝이 모두 혼잡 구간</b>이다: 앞쪽 10/3~5는 한국 연휴(오사카행 항공 러시 + 도톤보리·구로몬에 한국인 관광객 파도), 뒤쪽 10/10~12는 일본 3연휴(교토·아리마·USJ에 일본 국내 관광객 피크 + 호텔가 상승). 조용한 코어는 <b>10/6(화)~10/9(금) 평일 구간</b>. 항공은 10/5(월·연휴 꼬리) 출발과 연휴 전 평일 귀국이 저렴하고, 10/11(일) 귀국이 최고가.</p>
+  <div class="frames">
+
+    <div class="frame">
+      <h3><span class="k">A</span>풀윈도 9박</h3>
+      <span class="range">10/2(금) 밤 출발 → 10/11(일) 귀국</span>
+      <div class="bar"><i class="half"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <div class="meta"><span class="pill">보류</span><span class="pill gold">경마 3종 전부</span><span class="pill warn">출발·귀국 모두 러시</span></div>
+      <ul>
+        <li>교토대상전 + 소노다 나이터 + JRA 교토까지 전부 포함</li>
+        <li>교토 2일·고베·오사카 2일도 다 들어가는 유일한 프레임</li>
+        <li>숙박 9박 + 연휴 절정 귀국편 = 예산 최상단, 후반 체력 관리 필요</li>
+      </ul>
+    </div>
+
+    <div class="frame">
+      <h3><span class="k">B</span>골든 미드 7박</h3>
+      <span class="range">10/3(토) 아침 출발 → 10/10(토) 귀국</span>
+      <div class="bar"><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="half"></i><i></i></div>
+      <div class="meta"><span class="pill ok">재조립 중 → ①-B (B7)</span><span class="pill gold">대상전 포함</span></div>
+      <ul>
+        <li>10/4 교토대상전과 10/9 소노다 나이터를 모두 잡는 최소 프레임</li>
+        <li>주말+평일 균형 — 도시 4일 + USJ + 경마 2회</li>
+        <li>귀국 10/10(토)은 연휴 첫날이라 좌석 조기 확보 필수</li>
+      </ul>
+    </div>
+
+    <div class="frame">
+      <h3><span class="k">C</span>뒷주간 5박 <span style="font-size:11px;color:var(--muted)">(기존안)</span></h3>
+      <span class="range">10/5(월) 출발 → 10/10(토) 귀국</span>
+      <div class="bar"><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="half"></i><i></i></div>
+      <div class="meta"><span class="pill">보류 — 대상전(10/4)과 양립 불가</span></div>
+      <ul>
+        <li>평일 중심이라 관광지·파크 혼잡 최소</li>
+        <li>소노다 나이터 O, 대상전 X, JRA는 귀국일 오전 스트레치만</li>
+        <li>평일 4일 풀가동 시 교토·고베·오사카 풀커버 (①-B 참조)</li>
+      </ul>
+    </div>
+
+    <div class="frame">
+      <h3><span class="k">D</span>앞반 6박</h3>
+      <span class="range">10/3(토) 출발 → 10/9(금·한글날) 귀국</span>
+      <div class="bar"><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="half"></i><i></i><i></i></div>
+      <div class="meta"><span class="pill ok">병렬 조립 중 → ①-B</span><span class="pill ok">귀국편 가장 무난</span></div>
+      <ul>
+        <li>교토대상전 O, 귀국이 연휴 동선과 반대라 항공 스트레스 최소</li>
+        <li>소노다는 10/8(목) 주간 개최로 대체 가능</li>
+        <li>주말 이틀(10/3·4)은 관광지 혼잡 감수</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tablebox">
+  <table>
+    <tr><th>프레임</th><th>항공 왕복 /인</th><th>숙박 /인</th><th>USJ /인</th><th>현지 경비 /인</th><th>합계 /인</th><th>상한 여유</th><th>쾌적도</th></tr>
+    <tr><td>A · 9박</td><td>45~55만 <small>(양끝 연휴)</small></td><td>45만 <small>(9박)</small></td><td>29만</td><td>63만 <small>(9일)</small></td><td><b>182~192만</b></td><td><span class="n">거의 없음</span></td><td>하 — 두 연휴 파도 모두 통과</td></tr>
+    <tr><td>B · 7박</td><td>42~52만</td><td>35만 <small>(7박)</small></td><td>29만</td><td>56만 <small>(8일)</small></td><td><b>162~172만</b></td><td>~30만</td><td>중하 — 양끝 주말 혼잡</td></tr>
+    <tr><td>C · 5박</td><td>32~42만 <small>(출발 연휴 꼬리)</small></td><td>25만 <small>(5박)</small></td><td>29만</td><td>42만 <small>(6일)</small></td><td><b>128~138만</b></td><td class="y">60만+</td><td>상 — 평일 코어만 사용</td></tr>
+    <tr><td>D · 6박</td><td>38~48만 <small>(출발 연휴 러시)</small></td><td>30만 <small>(6박)</small></td><td>29만</td><td>49만 <small>(7일)</small></td><td><b>146~156만</b></td><td>~45만</td><td>중 — 앞주말 한국인 파도</td></tr>
+  </table>
+  </div>
+  <div class="note"><b>모델 가정 (둘이 검증할 것):</b> 환율 100엔=950원 · 숙박은 복지몰 3성급 <b>박당 10만 원/실</b>(2인 나눠 5만/인·박) — 복지몰 실가 확인이 1순위 숙제 · USJ는 입장권+패스7 기준 약 ¥30,600(프리미엄이면 +13만, 패스4면 −11만) · 현지 경비 7만/일/인(식사 3.5·교통 1·입장료 등 2.5) · 쇼핑 별도. 2인 합산은 ×2.</div>
+  <div class="note"><b>비용×쾌적 축의 결론:</b> 두 축 모두 <b>C(5박)가 우세</b> — 유일하게 두 연휴 파도를 다 피하고, 1인 60만+ 여유가 남아 업그레이드(USJ 프리미엄 패스, 고베규 디너, 호텔 등급)로 돌릴 수 있다. B·D는 "하루라도 더"의 값으로 주말 혼잡을 사는 구조, A는 예산 상한에 걸리는 풀커버형. 경마(교토대상전)는 이 축에서는 기간을 늘릴 근거가 되지 못함 — 관심사 모듈 ⑦ 참조.</div>
+</section>
+
+<!-- ========== 1.4 module library ========== -->
+<section>
+  <h2>①-A 모듈 라이브러리<span class="sec">일정 = 모듈의 조합. 크기·에너지·최적 슬롯 명세</span></h2>
+  <p class="sub">하루는 [풀데이 1개] 또는 [반나절 2개] + [저녁 1개]로 조립한다. ⚓ = 고정 앵커. 모듈별 세부 가이드(코스·실전 정보·후기 포인트·공식 링크·<b>채택/고민/제외 판정 토글</b>)는 별도 페이지 → <a href="modules.html"><b>간사이 모듈 도감</b></a></p>
+  <div class="tablebox">
+  <table>
+    <tr><th>모듈</th><th>크기</th><th>체력</th><th>최적 슬롯</th><th>메모</th></tr>
+    <tr><td>⚓ USJ</td><td>풀데이</td><td>최상</td><td>평일 화~목</td><td>전날 저녁은 가볍게, 다음날은 낮은 체력 모듈로</td></tr>
+    <tr><td>⚓ 교토대상전</td><td>오후 반나절</td><td>중</td><td>10/4(일) 고정</td><td>지정석 사전 구매 · 13시 입장~17시 이탈</td></tr>
+    <tr><td>교토 동부</td><td>풀데이</td><td>상</td><td>평일</td><td>후시미이나리 아침 필수 — 도감 ③</td></tr>
+    <tr><td>교토 서북 (아라시야마·금각사)</td><td>풀데이</td><td>상</td><td>평일</td><td>교토 2차 방문 카드</td></tr>
+    <tr><td>우지</td><td>반나절</td><td>중</td><td>평일 오전</td><td>말차·뵤도인 — 교토 동부와 같은 노선축</td></tr>
+    <tr><td>나라 (사슴·대불)</td><td>반나절</td><td>중</td><td>주말도 무난</td><td>사슴은 오전이 온순 — 도감 ⑤-B</td></tr>
+    <tr><td>고베 시내</td><td>반나절~풀</td><td>중</td><td>주말도 무난</td><td>고베규는 런치로</td></tr>
+    <tr><td>아리마·롯코 온천</td><td>반나절</td><td>하(회복)</td><td><b>USJ 전날 최적</b></td><td>로프웨이 막차 17시대가 축</td></tr>
+    <tr><td>오사카 랜드마크 (성·신세카이)</td><td>반나절</td><td>중</td><td>아무 때나</td><td>오사카성은 개장 직후</td></tr>
+    <tr><td>카이유칸 수족관</td><td>반나절</td><td>하</td><td><b>우천 스왑 카드</b></td><td>고래상어 대수조 — 비 오면 아무 모듈과 교체</td></tr>
+    <tr><td>도톤보리·쇼핑</td><td>저녁</td><td>하</td><td>매일 밤</td><td>돈키호테 면세 줄은 밤에 김</td></tr>
+    <tr><td>야경 (우메다 or 하루카스)</td><td>저녁</td><td>하</td><td>갠 날 택1</td><td>공중정원 vs 300m — 하나면 충분</td></tr>
+    <tr><td>소노다 주간 <small>(예비)</small></td><td>반나절</td><td>하</td><td>10/8(목)</td><td>대상전 무산 시의 백업</td></tr>
+  </table>
+  </div>
+  <div class="note"><b>조립 규칙:</b> ① 풀데이(체력 상 이상) 3일 연속 금지 ② 반나절 2개 = 하루 (단 이동축이 겹칠 것 — 우지+교토동부 O, 나라+고베 X) ③ 온천은 USJ 전날 ④ 주말 슬롯엔 혼잡 완만 모듈(나라·고베·경마장), 평일 슬롯에 혼잡 민감 모듈(교토·USJ) ⑤ 비 예보 시 카이유칸·쇼핑으로 스왑.</div>
+</section>
+
+<!-- ========== 1.5 parallel assembly ========== -->
+<section>
+  <h2>①-B 병렬 조립 — 플랜 D(6박) vs 플랜 B7(7박)<span class="sec">모듈 라이브러리로 조립한 두 완성형</span></h2>
+  <p class="sub">교토대상전(10/4) 채택으로 10/3 출발은 사실상 확정 — 남은 변수는 <b>귀국일: 10/9(금) vs 10/10(토)</b>. C(5박)는 대상전과 양립 불가로 보류. 항공은 편명 대신 노려야 할 시간대로 표기.</p>
+
+  <div class="tracks">
+
+    <div class="track">
+      <h3>플랜 B7 — 7박 · 여유일 추가형</h3>
+      <p class="tsub">10/3(토) → 10/10(토) · 1인 162~172만 · D + 여유일 하루</p>
+      <div class="trow"><span class="td">10.03<small>토·개천절</small></span><span class="tc">✈ 아침 최조편 → 체크인 → [도톤보리 저녁] <span class="pill warn">韓연휴 러시</span></span></div>
+      <div class="trow"><span class="td">10.04<small>일</small></span><span class="tc">[오사카 반나절] + ⚓[교토대상전 오후] <span class="pill gold">지정석</span></span></div>
+      <div class="trow"><span class="td">10.05<small>월</small></span><span class="tc">[교토 동부 풀데이]</span></div>
+      <div class="trow"><span class="td">10.06<small>화</small></span><span class="tc">[고베 시내 반나절] + [아리마·롯코 반나절] — USJ 전날 온천 규칙</span></div>
+      <div class="trow"><span class="td">10.07<small>수</small></span><span class="tc">⚓[USJ 풀데이]</span></div>
+      <div class="trow"><span class="td">10.08<small>목</small></span><span class="tc">[나라 반나절] + [오사카 오후 반나절]</span></div>
+      <div class="trow"><span class="td">10.09<small>금</small></span><span class="tc"><b>여유일(압력 밸브)</b> — [우지 반나절] or [교토 서북] or [쇼핑·회복]<div class="alt">6일 치 피로가 여기서 정산된다 — 비워둘 용기가 이 플랜의 본체</div></span></div>
+      <div class="trow"><span class="td">10.10<small>토·복귀</small></span><span class="tc">오전 여유 → ✈ 저녁 귀국 <span class="pill warn">日연휴 첫날 — 좌석 조기 확보</span><div class="alt">스트레치: JRA 교토 개막 오전 1~3R (경마 2회차, 관심자 한정)</div></span></div>
+      <div class="note" style="margin-top:14px"><b>B7의 성격:</b> D와 동일한 6일 코어에 <b>여유일(10/9 금)</b> 하나를 더 산다. 값은 +1박 숙박 + 귀국편 연휴 첫날 프리미엄 ≈ <b>+16만/인</b>. 복귀 후 휴식은 일요일 하루로 줄어든다.</div>
+    </div>
+
+    <div class="track">
+      <h3>플랜 D — 6박 · 주말 활용형</h3>
+      <p class="tsub">10/3(토) → 10/9(금) · 1인 146~156만 · 대상전 채택 반영 재배치 (v6)</p>
+      <div class="trow"><span class="td">10.03<small>토·개천절</small></span><span class="tc">✈ 아침 최조편 타깃(연휴 러시 — 가장 먼저 마르는 좌석) → 오후 체크인 → 도톤보리 저녁 <span class="pill warn">韓연휴</span></span></div>
+      <div class="trow"><span class="td">10.04<small>일</small></span><span class="tc">오전 오사카 느긋하게(구로몬 브런치 등) → 오후 <b>교토대상전</b>(13시 입장 → 패독 → 메인 15시대 → 17시 전 이탈) <span class="pill gold">지정석 사전 구매</span><div class="alt">마권은 1인 ¥1,000 상한으로 "이름 마음에 드는 말" 놀이 — 초심자 정석</div></span></div>
+      <div class="trow"><span class="td">10.05<small>월·韓공휴일</small></span><span class="tc">교토 풀데이(동부 골든 루트) — 일본 기준 평일<div class="alt">한국인 관광객 파도(연휴 마지막날)는 감수 — 후시미이나리 아침 필수</div></span></div>
+      <div class="trow"><span class="td">10.06<small>화</small></span><span class="tc">고베·아리마 풀데이 — 기타노 → 고베규 런치 → 롯코 경유 아리마 온천 <span class="pill">온천 = 회복 겸용</span><div class="alt">USJ 전날을 온천으로 끝내는 배치 — 다음날 오픈런 체력 충전</div></span></div>
+      <div class="trow"><span class="td">10.07<small>수</small></span><span class="tc">USJ 풀데이 — 동일 백본 <span class="pill ok">기본값</span></span></div>
+      <div class="trow"><span class="td">10.08<small>목</small></span><span class="tc"><b>압력 밸브 슬롯</b> — 기본값: 나라 반나절(사슴+대불) → 오후 오사카 복귀(쇼핑·못 간 곳 마무리)<div class="alt">피로 누적 시: 나라를 버리고 오사카 느긋한 하루 / 체력 만땅 시: 교토 2차(아라시야마·금각사)</div></span></div>
+      <div class="trow"><span class="td">10.09<small>금·한글날</small></span><span class="tc">오전 여유 → ✈ 오후~저녁 귀국 — 연휴 첫날이지만 일본→한국 방향이라 무난 <span class="pill ok">항공 스트레스 최소</span></span></div>
+      <div class="note" style="margin-top:14px"><b>v6 재배치의 논리:</b> ① 경마는 <b>교토대상전 오후 모듈로 채택</b>(소노다는 예비) — 지정석 사전 구매가 쾌적도 방어의 핵심. ② 도시 하나당 하루를 억지로 채우지 않는다 — <b>나라는 반나절 크기</b>라 반나절로, 오사카는 별도의 날 대신 <b>매일 저녁 + 10/4 오전 + 10/8 오후에 흡수</b>. ③ 10/8이 압력 밸브 — 그날의 컨디션이 일정을 정하게 남겨둔 유일한 슬롯. ④ 온천(10/6)을 USJ 전날에 배치해 체력 곡선을 관리.</div>
+    </div>
+  </div>
+
+  <div class="tablebox">
+  <table>
+    <tr><th>비교 축</th><th>플랜 D · 6박 (귀국 10/9 금)</th><th>플랜 B7 · 7박 (귀국 10/10 토)</th></tr>
+    <tr><td>총비용 /인</td><td><span class="y">146~156만</span></td><td>162~172만 (+16만)</td></tr>
+    <tr><td>현지 쾌적도</td><td colspan="2">동일 — 앞주말 이틀 혼잡(경마장·오사카 배치로 완화), 이후 평일 코어</td></tr>
+    <tr><td>커버리지·페이스</td><td>교토·고베·나라·오사카 풀커버 — 압력 밸브는 10/8 하나</td><td><span class="y">풀커버 + 온전한 여유일 1 (10/9)</span> — 우지·교토 2차 추가 여지</td></tr>
+    <tr><td>항공 리스크</td><td>출발 연휴 러시 / <span class="y">귀국 무난(10/9)</span></td><td>출발 연휴 러시 / <b>귀국도 연휴 첫날(10/10)</b> — 양쪽 러시</td></tr>
+    <tr><td>복귀 전 휴식</td><td><span class="y">토·일 이틀</span></td><td>일요일 하루</td></tr>
+    <tr><td>경마</td><td>교토대상전(10/4 오후) 채택</td><td>동일 + 귀국일 JRA 교토 개막 오전 스트레치 옵션</td></tr>
+    <tr><td>USJ</td><td colspan="2">동일 — 10/7(수) 기본값, 동일 백본·패스 선택지</td></tr>
+  </table>
+  </div>
+  <div class="note"><b>한 줄 정리:</b> 두 플랜의 6일 코어(10/3~8)는 완전히 동일 — 다른 것은 마지막 하루뿐. <b>"현지 여유일 하루 + 16만/인 + 귀국 좌석 리스크" vs "집에서 토·일 이틀 휴식"</b>의 교환이다. 귀국편 가격을 실제로 조회해서 10/9와 10/10의 차이가 크면 D, 작으면 B7이 정답에 가까워진다.</div>
+</section>
+
+<!-- ========== 3. USJ ========== -->
+<section>
+  <h2>② USJ 10/7(수) — 패스 3옵션<span class="sec">프로필: 스릴 전부 탑승 · 호러는 분위기만</span></h2>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">최상위</span>
+      <h3>프리미엄 (~¥35,200)</h3>
+      <p>사실상 전 어트랙션 대기 스킵 + 부가 특전.</p>
+      <ul>
+        <li>동선 고민 자체가 사라짐 — 가장 편한 하루</li>
+        <li>평일 수요일엔 과투자일 수 있음</li>
+        <li>2인 기준 패스7 대비 +¥26,000 ≈ 고베규 디너 1회</li>
+      </ul>
+      <div class="foot">입장권 별도 ¥8,000~9,000대 · <b>확실한 편안함</b>에 돈을 쓰는 선택</div>
+    </div>
+    <div class="opt">
+      <span class="tag">균형</span>
+      <h3>패스7 (~¥21,800)</h3>
+      <p>주요 7개 + 닌텐도 확약권. 할로윈 시즌 표준.</p>
+      <ul>
+        <li>플라잉 다이너소어 + 포비든 저니 포함 조합으로 선택</li>
+        <li>패스 밖 라이드는 오픈런 + 싱글 라이더로 커버</li>
+        <li>수요일 대기 30~60분대 전제에서 프리미엄과 체감차 작음</li>
+      </ul>
+      <div class="foot">구매 시 체크 2개: <b>닌텐도 확약권 포함</b> · <b>플다+저니 포함 조합</b></div>
+    </div>
+    <div class="opt">
+      <span class="tag">절약</span>
+      <h3>패스4 (~¥9,800) + 오픈런</h3>
+      <p>핵심 4개만 지정하고 나머지는 발로 뛰는 안.</p>
+      <ul>
+        <li>플다·저니·마리오카트·백드롭 커버가 4슬롯에 빠듯</li>
+        <li>닌텐도 확약권 없는 버전 오구매 리스크</li>
+        <li>할로윈 시즌 저녁 혼잡을 몸으로 감수</li>
+      </ul>
+      <div class="foot">"라이드 몇 개는 놓쳐도 됨" 합의가 있을 때만</div>
+    </div>
+  </div>
+  <div class="tablebox">
+  <table>
+    <tr><th>공통 백본 (패스와 무관)</th><th>내용</th></tr>
+    <tr><td>오픈런</td><td>공식 오픈 75분 전 도착 → 조기 개장 → 첫 타 플라잉 다이너소어</td></tr>
+    <tr><td>낮</td><td>닌텐도 월드(마리오카트→동키콩→미니게임) → 늦은 오후 해리포터(해질녘 호그와트)</td></tr>
+    <tr><td>밤</td><td>거리 좀비 분위기 관람(미로·사다코 줄은 패스) → 할리우드 드림 백드롭 야간 탑승 마무리</td></tr>
+    <tr><td>토론 거리 ①</td><td>식사: 키노피오 카페(닌텐도 테마, 대기·계획 필요) vs 퀵서비스로 라이드 시간 확보</td></tr>
+    <tr><td>토론 거리 ②</td><td>워터월드 스턴트쇼(약 20분, 회차제) 포함 여부 — 쇼 안 보고 라이드 올인도 흔한 선택</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ========== 4. Kyoto ========== -->
+<section>
+  <h2>③ 교토 — 4옵션</h2>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">클래식</span>
+      <h3>동부 골든 루트</h3>
+      <ul>
+        <li>후시미이나리 아침 참배(8시 전 토리이 터널)</li>
+        <li>기요미즈데라 → 산넨자카·니넨자카</li>
+        <li>기온·가와라마치 점심 → 폰토초 저녁</li>
+      </ul>
+      <div class="foot">첫 교토라면 이 축은 빼기 어려움 · 남→북 동선</div>
+    </div>
+    <div class="opt">
+      <span class="tag">풍경</span>
+      <h3>서북부 루트</h3>
+      <ul>
+        <li>아라시야마 대나무숲 아침 → 도게츠교</li>
+        <li>금각사 → 료안지 돌정원</li>
+        <li>니조성 마무리</li>
+      </ul>
+      <div class="foot">사진이 남는 코스 · 이동은 버스/택시 비중 높음</div>
+    </div>
+    <div class="opt">
+      <span class="tag">한적</span>
+      <h3>우지 + 후시미</h3>
+      <ul>
+        <li>우지 뵤도인(10엔 동전의 그 사원) + 말차 거리</li>
+        <li>오후 후시미이나리 (오사카 복귀 동선상)</li>
+        <li>혼잡 최소 — 여유파 조합</li>
+      </ul>
+      <div class="foot">관광 밀도는 낮고 만족 밀도는 높은 변주</div>
+    </div>
+    <div class="opt">
+      <span class="tag">풀코스</span>
+      <h3>교토 2일 (①+②)</h3>
+      <ul>
+        <li>동부 하루 + 서북부 하루</li>
+        <li>하루짜리 교토의 아쉬움 해소</li>
+        <li>왕복 30~45분 이동 2회 반복 비용</li>
+      </ul>
+      <div class="foot">프레임 A·B에서 무리 없음 · C에선 고베와 트레이드</div>
+    </div>
+  </div>
+
+  <div class="tablebox">
+  <table>
+    <tr><th>스팟</th><th>뭐가 있나</th><th>소요</th><th>메모</th></tr>
+    <tr><td>후시미이나리</td><td>수천 개 주홍 토리이가 산을 덮는 터널 — 교토를 대표하는 한 장면</td><td>1.5~2h</td><td>24시간 무료 · 8시 전 도착이 승부, 중턱 요츠츠지 전망대까지만 올라도 충분</td></tr>
+    <tr><td>기요미즈데라</td><td>절벽 위 나무 무대(본당)에서 교토 시가 조망 · 오토와 폭포 물 마시기</td><td>1~1.5h</td><td>산넨자카·니넨자카 기와 골목과 세트 — 골목이 본체라는 평도</td></tr>
+    <tr><td>기온·하나미코지</td><td>게이샤(게이코) 거리 · 목조 찻집 거리의 저녁 정취</td><td>1h</td><td>사진은 공도에서만(사유 골목 촬영 금지 구역 있음)</td></tr>
+    <tr><td>니시키 시장</td><td>"교토의 부엌" — 반찬·두부·꼬치·장아찌 400m 아케이드</td><td>1h</td><td>먹으며 걷기 금지, 가게 앞에서 먹고 이동</td></tr>
+    <tr><td>아라시야마</td><td>대나무숲 오솔길 + 도게츠교 강변 풍경</td><td>반나절</td><td>대나무숲도 아침이 승부 · 몽키파크(산 위 원숭이+시가 전망) 옵션</td></tr>
+    <tr><td>금각사</td><td>금박 3층 누각이 연못에 비치는 그 장면</td><td>40m</td><td>동선상 아라시야마와 같은 날 묶는 게 정석 (입장 ~¥500)</td></tr>
+    <tr><td>니조성</td><td>쇼군의 거처 — 걸으면 우는 '나이팅게일 마루', 장벽화</td><td>1~1.5h</td><td>성곽보다 인테리어가 본체</td></tr>
+    <tr><td>은각사·철학의 길</td><td>수수한 미학의 정원 + 수로 따라 걷는 산책로</td><td>1.5h</td><td>동부를 이틀 쓰는 경우의 추가 카드</td></tr>
+    <tr><td>우지</td><td>뵤도인(10엔 동전의 그 건물) · 말차의 본고장 — 말차소바·말차 파르페</td><td>반나절</td><td>JR/게이한으로 교토역에서 ~20분 · 후시미이나리와 같은 노선축</td></tr>
+  </table>
+  </div>
+  <div class="note"><b>교토 음식 시그니처:</b> 유도후(두부 가이세키 — 난젠지 부근), 오반자이(교토식 가정식 반찬), 니신소바(청어 소바), 말차 디저트(우지 기원). 저녁은 폰토초 골목(가모가와 강변 좁은 골목의 식당가)이 분위기 정점.</div>
+</section>
+
+<!-- ========== 5. Kobe ========== -->
+<section>
+  <h2>④ 고베 — 3옵션</h2>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">시내 클래식</span>
+      <h3>기타노 → 하버랜드</h3>
+      <ul>
+        <li>기타노이진칸(오전, 언덕) → 구거류지</li>
+        <li>고베규 런치(디너의 절반 가격대)</li>
+        <li>난킨마치 → 메리켄파크·모자이크 야경</li>
+      </ul>
+      <div class="foot">이동 적고 밀도 높은 표준형 · 야경까지 풀데이</div>
+    </div>
+    <div class="opt">
+      <span class="tag">온천 콤보</span>
+      <h3>시내 압축 + 아리마·롯코</h3>
+      <ul>
+        <li>오전 기타노 압축 + 고베규 런치</li>
+        <li>롯코 케이블카 → 산 전망 → 로프웨이로 아리마</li>
+        <li>킨노유/긴노유 당일 입욕 → 신테츠 복귀</li>
+      </ul>
+      <div class="foot">로프웨이 막차(17시대)가 축 · 수건 대여 가능, 짐 불필요</div>
+    </div>
+    <div class="opt">
+      <span class="tag">원정</span>
+      <h3>히메지성 반일 + 고베 반일</h3>
+      <ul>
+        <li>JR 신쾌속으로 히메지(오사카서 약 60분)</li>
+        <li>백로성(세계유산) 오전 관람</li>
+        <li>귀로에 고베 하차 — 고베규 + 하버랜드</li>
+      </ul>
+      <div class="foot">성곽 취향이면 최고 만족 · 이동량은 가장 많음</div>
+    </div>
+  </div>
+
+  <div class="tablebox">
+  <table>
+    <tr><th>스팟</th><th>뭐가 있나</th><th>소요</th><th>메모</th></tr>
+    <tr><td>기타노이진칸</td><td>메이지 개항기 서양 상인들의 저택 거리 — 언덕 위 이국 풍경</td><td>1.5h</td><td>내부 관람은 2~3관만 골라서 · 언덕이니 오전 체력에</td></tr>
+    <tr><td>고베규</td><td>세계에서 가장 유명한 와규 — 철판 카운터에서 눈앞 조리</td><td>1~1.5h</td><td><b>런치 코스가 디너의 절반값</b>(~¥6,000대부터) · 인기점은 예약</td></tr>
+    <tr><td>난킨마치</td><td>일본 3대 차이나타운 — 길거리 만두·부타망</td><td>40m</td><td>로쇼키 부타망(돼지만두)이 대표 간식</td></tr>
+    <tr><td>메리켄파크·하버랜드</td><td>포트타워 · 항구 야경 · 모자이크 대관람차</td><td>1.5h</td><td>해질녘~야간이 본체</td></tr>
+    <tr><td>아리마온천</td><td>일본 3대 고탕(1300년) — 철분 붉은 <b>금탕</b> / 탄산 투명 <b>은탕</b></td><td>반나절</td><td>당일 입욕 ¥650~800선 · 탄산센베이 골목 산책 세트</td></tr>
+    <tr><td>롯코산</td><td>"1000만 불 야경" — 일본 3대 야경 전망대</td><td>2h+</td><td>케이블카+로프웨이로 아리마와 연결 — 경치 코스의 축</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ========== 6. Osaka ========== -->
+<section>
+  <h2>⑤ 오사카 — 4옵션</h2>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">랜드마크</span>
+      <h3>정석 일주</h3>
+      <ul>
+        <li>오사카성(개장 직후) → 구로몬 시장 점심</li>
+        <li>신세카이·츠텐카쿠 → 신사이바시</li>
+        <li>우메다 스카이빌딩 or 하루카스300 야경</li>
+      </ul>
+      <div class="foot">첫 오사카 표준형 · 주유패스와 궁합 좋음</div>
+    </div>
+    <div class="opt">
+      <span class="tag">가성비</span>
+      <h3>주유패스 풀가동</h3>
+      <ul>
+        <li>1일권: 지하철 무제한 + 오사카성·전망대 등 입장 포함</li>
+        <li>정석 일주 코스에 리버크루즈·덴포잔 대관람차 추가</li>
+        <li>입장료 3곳이면 본전 초과</li>
+      </ul>
+      <div class="foot">"많이 돌수록 이득" 구조 — 강행군 각오</div>
+    </div>
+    <div class="opt">
+      <span class="tag">식도락</span>
+      <h3>먹고 사는 날</h3>
+      <ul>
+        <li>구로몬 시장 조식 → 도톤보리 낮 되돌기</li>
+        <li>우메다 백화점 지하 + 한큐 쇼핑</li>
+        <li>저녁 미쉐린 빕구르망급 예약 한 곳</li>
+      </ul>
+      <div class="foot">체력 회복일 겸용 · USJ 다음날 배치에 최적</div>
+    </div>
+    <div class="opt">
+      <span class="tag">경마 결합</span>
+      <h3>낮 시내 + 밤 소노다</h3>
+      <ul>
+        <li>정석 일주의 야경 슬롯을 나이터로 치환</li>
+        <li>우메다에서 한큐 10분 — 동선 손실 최소</li>
+        <li>10/9(금) 한정 성립</li>
+      </ul>
+      <div class="foot">②경마 옵션과 연동 · 야경은 다른 날로 이월</div>
+    </div>
+  </div>
+
+  <div class="tablebox">
+  <table>
+    <tr><th>스팟</th><th>뭐가 있나</th><th>소요</th><th>메모</th></tr>
+    <tr><td>오사카성</td><td>도요토미 히데요시의 성 — 천수각 전망 + 해자·공원</td><td>1.5~2h</td><td>천수각 내부는 박물관(엘리베이터 있음) · 개장 직후가 한산</td></tr>
+    <tr><td>구로몬 시장</td><td>"오사카의 부엌" — 참치·성게·와규 꼬치를 서서 먹는 아케이드</td><td>1h</td><td>아침~점심이 활기 정점, 오후엔 닫는 집 많음</td></tr>
+    <tr><td>신세카이·츠텐카쿠</td><td>쇼와 레트로 유흥가 — 쿠시카츠(튀김꼬치) 발상지</td><td>1.5h</td><td>"소스 두 번 찍기 금지"가 이 동네 헌법</td></tr>
+    <tr><td>도톤보리·신사이바시</td><td>글리코 사인 · 강변 네온 · 먹거리와 쇼핑의 심장</td><td>매일 저녁</td><td>숙소를 이 근처로 잡으면 일정이 아니라 일상이 됨</td></tr>
+    <tr><td>우메다 스카이빌딩</td><td>공중정원 전망대 — 두 타워를 잇는 옥상 링</td><td>1h</td><td>하루카스300(일본 최고층 300m)과 택1이면 충분</td></tr>
+    <tr><td>카이유칸</td><td>세계 최대급 수족관 — 고래상어 대수조</td><td>2h</td><td>덴포잔 대관람차와 세트 · 비 오는 날 카드로도 최적 (~¥2,700)</td></tr>
+    <tr><td>돈키호테·드럭스토어</td><td>기념품·잡화 쇼핑의 종착지</td><td>-</td><td>도톤보리점 24시간 · 면세 카운터 줄은 밤에 김</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ========== 5.5 Nara ========== -->
+<section>
+  <h2>⑤-B 나라 — 반나절 원정<span class="sec">6박 프레임에서 열린 슬롯의 유력 후보</span></h2>
+  <p class="sub">오사카난바에서 긴테츠 급행 약 40분(~¥680) — 간사이에서 가장 값싼 원정. 핵심이 공원 하나에 모여 있어 반나절로 완결된다.</p>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">표준</span>
+      <h3>반나절 클래식</h3>
+      <ul>
+        <li><b>나라공원 사슴</b> — 야생 사슴 ~1,200마리, 사슴전병(¥200)에 고개 숙여 인사하는 사슴</li>
+        <li><b>도다이지</b> — 세계 최대급 목조건축 대불전 + 15m 청동 대불 (~¥800)</li>
+        <li><b>나카타니도</b> — 고속 떡메치기 시연으로 유명한 요모기 모찌</li>
+      </ul>
+      <div class="foot">이동 포함 5~6시간 · 오전 출발 → 오후 오사카 복귀가 정석</div>
+    </div>
+    <div class="opt">
+      <span class="tag">확장</span>
+      <h3>풀데이 나라</h3>
+      <ul>
+        <li>클래식 + <b>가스가타이샤</b>(수천 개 석등·청동등롱 참배길)</li>
+        <li>나라마치 옛 상가 골목 산책 + 커피</li>
+        <li>저녁 오사카 복귀 후 도톤보리</li>
+      </ul>
+      <div class="foot">느긋파의 선택 · 교토와 분위기가 겹치지 않는 "고대 일본" 결</div>
+    </div>
+  </div>
+  <div class="note"><b>팁:</b> 사슴은 오전이 온순하고 오후엔 전병에 공격적(진짜로 옷을 뭅니다). 전병은 사슴 없는 데서 사서 주머니에 숨기고 이동. 10월은 사슴 발정기 시작이라 수사슴과는 거리 유지.</div>
+</section>
+
+<!-- ========== 5.7 food ========== -->
+<section>
+  <h2>⑤-C 식도락 치트시트<span class="sec">도시 × 반드시 먹을 것</span></h2>
+  <div class="tablebox">
+  <table>
+    <tr><th>도시</th><th>시그니처</th><th>어디서</th></tr>
+    <tr><td>오사카</td><td>타코야키 · 오코노미야키 · 쿠시카츠 · 참치/성게 해산물</td><td>도톤보리 노포(타코야키), 미즈노·후쿠타로(오코노미야키 명가), 신세카이 다루마(쿠시카츠), 구로몬 시장</td></tr>
+    <tr><td>교토</td><td>유도후 · 오반자이 · 니신소바 · 말차 디저트</td><td>난젠지 부근(유도후), 폰토초 골목(저녁), 니시키 시장(주전부리), 우지·기온 츠지리(말차)</td></tr>
+    <tr><td>고베</td><td>고베규 · 부타망 · 항구 베이커리 문화</td><td>철판 스테이크 하우스 <b>런치</b>, 난킨마치 로쇼키, 기타노 카페</td></tr>
+    <tr><td>나라</td><td>요모기 모찌 · 카키노하즈시(감잎 초밥)</td><td>나카타니도(모찌), 상점가 노포(감잎초밥)</td></tr>
+    <tr><td>USJ</td><td>버터비어(해리포터) · 키노피오 카페(닌텐도) · 미니언 간식</td><td>파크 내 — 키노피오 카페는 대기 계획 필요</td></tr>
+  </table>
+  </div>
+  <div class="note"><b>운영 팁:</b> 인기 식당 저녁은 구글맵·태블로그에서 1~2곳만 사전 예약하고 나머지는 현장 유연하게. 오사카 명가들은 저녁 대기 30분+가 기본이라 "점심에 명가, 저녁은 노포 골목" 배치가 시간 효율이 좋다.</div>
+</section>
+
+<!-- ========== 7. lodging ========== -->
+<section>
+  <h2>⑥ 숙소 거점 — 3옵션<span class="sec">전 기간 한 곳 고정 전제</span></h2>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag">밤이 강함</span>
+      <h3>난바 · 도톤보리권</h3>
+      <ul>
+        <li>밤거리·식당 도보권 — 저녁 일정이 풍부해짐</li>
+        <li>공항 직결(난카이 라피트)</li>
+        <li>교토·고베행은 우메다 대비 10~15분 손해</li>
+      </ul>
+      <div class="foot">"저녁마다 놀 사람"의 선택</div>
+    </div>
+    <div class="opt">
+      <span class="tag">이동이 강함</span>
+      <h3>우메다 · 오사카역권</h3>
+      <ul>
+        <li>JR 신쾌속(교토·고베·히메지)과 한큐(소노다·교토) 허브</li>
+        <li>원정형 일정(교토2일·히메지·경마)과 최고 궁합</li>
+        <li>밤거리 정취는 난바보다 담백</li>
+      </ul>
+      <div class="foot">이 보드처럼 원정이 많은 플랜이면 실질 1픽</div>
+    </div>
+    <div class="opt">
+      <span class="tag">절충</span>
+      <h3>신사이바시 · 혼마치권</h3>
+      <ul>
+        <li>난바 도보 15분 + 미도스지선으로 우메다 8분</li>
+        <li>가격대가 양쪽보다 한 단계 낮은 경우 많음</li>
+        <li>조용히 자고 싶은 사람에게 유리</li>
+      </ul>
+      <div class="foot">가성비와 균형의 중간값</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 2. keiba ========== -->
+<section>
+  <h2>⑦ 관심사 모듈 — 경마<span class="sec">교토대상전 채택 (플랜 D 10/4 오후) · 나머지는 예비</span></h2>
+  <p class="sub">여행의 축이 아니라 끼워 넣는 조각. 관심 없는 쪽은 같은 시간대에 근처 자유시간(우메다 쇼핑, 카페, 온천)을 페어링하면 둘 다 만족하는 구조가 된다.</p>
+  <div class="opts">
+    <div class="opt">
+      <span class="tag warm">빅 이벤트</span>
+      <h3>교토대상전 GII — 10/4(일)</h3>
+      <p>가을 교토 개최의 개막 중상. 이름 있는 고참마 + 대형 스탠드의 함성.</p>
+      <ul>
+        <li>2023년 리뉴얼된 교토경마장(요도) — 시설 쾌적</li>
+        <li>메인은 15시대 한 경주 — 나머지는 일반 경주</li>
+        <li>일요일 GII라 수만 명 규모: 패독·발매기 줄 각오</li>
+      </ul>
+      <div class="foot">프레임 <b>A·B·D</b>에서 가능 · 오사카에서 게이한 요도역 40분+</div>
+    </div>
+    <div class="opt">
+      <span class="tag">로컬 나이터</span>
+      <h3>소노다 나이터 — 10/9(금)</h3>
+      <p>조명 아래 지방경마. 작아서 패독·결승선이 다 가깝고 혼잡 스트레스 없음.</p>
+      <ul>
+        <li>한큐 우메다→소노다역 약 10분 + 도보/셔틀</li>
+        <li>입장 수백 엔, 마권은 현금 — 소액으로 놀이처럼</li>
+        <li>초심자가 경마의 구조를 배우기엔 이쪽이 상위 호환</li>
+      </ul>
+      <div class="foot">프레임 <b>A·B·C</b>에서 가능 · 오사카 낮 일정 뒤에 자연 결합</div>
+    </div>
+    <div class="opt">
+      <span class="tag">스케일 맛보기</span>
+      <h3>JRA 교토 개막 — 10/10(토)·11(일)</h3>
+      <p>중앙경마의 스케일(잔디 코스·대형 전광판)을 오전에 가볍게.</p>
+      <ul>
+        <li>개막일 오전 1~3경주는 한산 — 초심자에게 쾌적</li>
+        <li>귀국일과 겹치면 저녁 비행기일 때만 성립</li>
+        <li>공항과 반대 방향이라 시간 계산 필수</li>
+      </ul>
+      <div class="foot">프레임 <b>A</b>(10/10 온전) · <b>B·C</b>(귀국일 오전 스트레치)</div>
+    </div>
+  </div>
+  <div class="note"><b>결정(v6):</b> <b>교토대상전 채택</b> — 초심자 2인에게는 "스포츠 이벤트의 재미"(만원 관중·패독·함성)가 로컬 트랙의 "발견의 재미"보다 안전하게 작동한다는 판단. 조건 두 개: <b>지정석 인터넷 사전 구매</b> + <b>오후 모듈 운용</b>(13시 입장 → 메인 15시대 → 17시 전 이탈). 소노다 주간(10/8)은 대상전이 어그러질 경우의 예비 카드.</div>
+</section>
+
+
+<!-- ========== 8. decision queue ========== -->
+<section>
+  <h2>결정 큐<span class="sec">둘이서 정하는 순서</span></h2>
+  <div class="tablebox">
+  <table>
+    <tr><th>순서</th><th>결정</th><th>고르는 것</th><th>데드라인 감각</th></tr>
+    <tr><td>1</td><td>기간 프레임</td><td>A / B / C / D — 비용×쾌적 표 기준</td><td>이게 정해져야 항공·숙소를 지를 수 있음 — <b>최우선</b></td></tr>
+    <tr><td>1.5</td><td>복지몰 숙박가 확인</td><td>박당 실가·취소 규정·대상 호텔</td><td>비용 모델의 최대 변수 — 프레임 결정과 동시에</td></tr>
+    <tr><td>2</td><td>항공권</td><td>프레임 확정 즉시 예약</td><td>10/10·11 귀국편이 가장 먼저 마름</td></tr>
+    <tr><td>3</td><td>USJ 패스</td><td>프리미엄 / 7 / 4</td><td>10/7 익스프레스 패스 매진 전 — 항공과 같은 주</td></tr>
+    <tr><td>4</td><td>숙소 거점</td><td>난바 / 우메다 / 신사이바시</td><td>프레임 확정 후 즉시, 무료취소로</td></tr>
+    <tr><td>5</td><td>도시별 옵션</td><td>③④⑤ + 관심사 모듈 ⑦</td><td>출발 1~2주 전까지 여유 있게</td></tr>
+  </table>
+  </div>
+  <div class="note warm"><b>변하지 않는 것:</b> 어느 조합이든 — 여권 확인, Visit Japan Web 등록, IC카드(아이폰=모바일 ICOCA/Suica, 안드로이드=공항서 물리 ICOCA), 예약 결제는 개인 카드(법인 마스터카드는 여행 프로모션 제외), 법인카드는 출국일 공항 라운지·발렛·면세점 멤버십 전용.</div>
+</section>
+
+<footer>2026.08.30 · 옵션 보드 v7 — 모듈 라이브러리 · D vs B7(귀국 10/9 vs 10/10) — 모든 논의된 사항은 유동적임, 강제 아님 · 경마 개최일·USJ 가격은 공식 페이지 기준, 예약 시점 재확인</footer>
+</div>
+
+</body>
+</html>
