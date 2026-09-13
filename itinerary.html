@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>간사이 8일 여정</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --ink:#1B2330; --muted:#5A6576; --line:#DCE1E9; --chip:#EDF0F4;
+  --accent:#35558E; --accent-soft:#E6ECF6;
+  --warm:#B94B2A; --warm-soft:#F8E8E1;
+  --gold:#86682B; --gold-soft:#F4EEDC;
+  --green:#3A6A4D; --green-soft:#E3EFE7;
+  --display:'Gowun Batang',Batang,serif; --body:'IBM Plex Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1; --line:#2A3240; --chip:#232B37;
+    --accent:#86A6DE; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+    --gold:#CBAD62; --gold-soft:#322B1B; --green:#86BD9A; --green-soft:#1E2F25;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A202A; --ink:#E8ECF2; --muted:#98A2B1; --line:#2A3240; --chip:#232B37;
+  --accent:#86A6DE; --accent-soft:#243247; --warm:#E08A63; --warm-soft:#3A2820;
+  --gold:#CBAD62; --gold-soft:#322B1B; --green:#86BD9A; --green-soft:#1E2F25;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}
+a{color:var(--accent)}
+.wrap{max-width:880px;margin:0 auto;padding:36px 20px 96px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* header */
+.hero{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.hero h1{font-size:34px;line-height:1.2;margin:8px 0 6px}
+.hero .sub{color:var(--muted);max-width:60ch;margin:0}
+.flight{display:grid;grid-template-columns:auto auto;gap:6px 14px;font-size:12.5px;color:var(--muted);align-items:baseline}
+.flight b{font-family:var(--mono);color:var(--ink);font-weight:500;font-size:13px}
+@media (max-width:640px){.flight{grid-template-columns:1fr}.flight span{margin-top:4px}}
+.stay{display:flex;gap:0;margin:18px 0 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.stay div{flex:1;padding:10px 12px;font-size:12.5px;color:var(--muted);border-right:1px solid var(--line)}
+.stay div:last-child{border-right:0}
+.stay b{display:block;color:var(--ink);font-size:14px;font-weight:700}
+.stay .k{color:var(--accent)}
+@media (max-width:640px){.hero{grid-template-columns:1fr}.stay{flex-direction:column}.stay div{border-right:0;border-bottom:1px solid var(--line)}.stay div:last-child{border-bottom:0}}
+
+/* day rail */
+.rail{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;margin:0 -20px;padding-left:20px;padding-right:20px;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;line-height:1.3;display:grid;text-align:center}
+.rail a b{font-family:var(--mono);font-weight:500;font-size:12.5px}
+.rail a small{color:var(--muted);font-size:10.5px}
+.rail a.ky{border-color:var(--gold)}
+.rail a:hover{border-color:var(--accent)}
+
+/* deadline box */
+.todo{margin:22px 0 8px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warm);border-radius:0 12px 12px 0;padding:16px 18px}
+.todo h2{font-size:17px;margin-bottom:10px}
+.todo ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:13.5px}
+.todo li b.d{font-family:var(--mono);font-weight:500;color:var(--warm);white-space:nowrap}
+.todo li.done{color:var(--muted);text-decoration:line-through}
+.todo li .why{color:var(--muted);font-size:12.5px}
+
+/* day */
+.day{margin-top:34px;scroll-margin-top:74px}
+.dayhead{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.dnum{font-family:var(--display);font-size:38px;line-height:.95;font-weight:700;white-space:nowrap;min-width:84px}
+.dnum small{display:block;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--accent);margin-bottom:2px}
+.dtitle h2{font-size:22px;line-height:1.25}
+.dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--chip);color:var(--muted)}
+.pill.stay{background:var(--accent-soft);color:var(--accent)}
+.pill.ky{background:var(--gold-soft);color:var(--gold)}
+.pill.warn{background:var(--warm-soft);color:var(--warm)}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.core{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.core span{background:var(--surface);border:1px solid var(--ink);border-radius:6px;padding:4px 10px;font-size:13px;font-weight:700}
+.core em{font-style:normal;color:var(--muted);font-weight:400;font-size:12px;align-self:center}
+
+/* timeline */
+.tl{margin:12px 0 0;padding:0;list-style:none;border-left:1px solid var(--line);margin-left:52px}
+.tl li{position:relative;display:grid;grid-template-columns:1fr;gap:2px;padding:7px 0 7px 16px;font-size:13.5px}
+.tl li::before{content:"";position:absolute;left:-4px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tl li.key::before{background:var(--accent);width:9px;height:9px;left:-5px;top:14px}
+.tl li.key .t{color:var(--accent)}
+.tl .t{position:absolute;left:-60px;top:7px;width:48px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tl .alt{color:var(--muted);font-size:12.5px}
+.tl .alt::before{content:"대체 · ";color:var(--gold);font-weight:700}
+.tl .warn{color:var(--warm);font-size:12.5px}
+.tl .note{color:var(--muted);font-size:12.5px}
+@media (max-width:640px){.tl{margin-left:46px}.tl .t{left:-54px;width:44px;font-size:12px}}
+
+.foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.foot div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;line-height:1.55}
+.foot h4{margin:0 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.foot .cut b{color:var(--warm)}
+.foot .why{grid-column:1/-1;border-color:var(--gold-soft);background:var(--gold-soft)}
+.foot .why h4{color:var(--gold)}
+.foot .why a{color:var(--gold)}
+@media (max-width:640px){.foot{grid-template-columns:1fr}}
+
+/* sections */
+.sec{margin-top:44px}
+.sec h2{font-size:22px;margin-bottom:6px}
+.sec p.lede{color:var(--muted);margin:0 0 14px;max-width:66ch;font-size:13.5px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 12px;background:var(--chip);border-bottom:1px solid var(--line)}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.mono{white-space:nowrap}
+.tscroll{overflow-x:auto}
+.pool{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.pool div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px}
+.pool h3{font-family:var(--body);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.pool ul{margin:0;padding-left:16px;display:grid;gap:3px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.7}
+@media print{.rail{position:static}.day{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="hero">
+  <div>
+    <p class="eyebrow">Kansai · 2026.10.03 – 10.10 · 7박 8일 · v3.1</p>
+    <h1>간사이 8일 여정</h1>
+    <p class="sub">둘이 같은 화면을 보고 바로 움직이기 위한 판. 각 날은 <b>코어 2~3개</b>만 지키고, 나머지는 대체·컷 순서대로 버린다. 노란 표시는 동행이 보낸 릴스·링크에서 들어온 카드.</p>
+  </div>
+  <div class="flight">
+    <span>가는 편</span><b>WE513 · 10/3 ICN 18:00 → KIX 19:55</b>
+    <span>오는 편</span><b>WE514 · 10/10 KIX 20:55 → ICN 22:55</b>
+    <span>예약</span><b>파라타항공 · 2명 · 발권완료</b>
+  </div>
+</header>
+<div class="stay">
+  <div><b><span class="k">D1</span> 오사카 1박</b>10/3 · 난바·닛폰바시 · 22시 이후 체크인 확인</div>
+  <div><b><span class="k">D2–D3</span> 교토 2박</b>10/4~5 · 가와라마치~기온시조 · 게이한·한큐·란덴 3선 도보권</div>
+  <div><b><span class="k">D4–D7</span> 오사카 4박</b>10/6~9 · 난바·닛폰바시 · 원파이브 or 레드루프</div>
+</div>
+
+<nav class="rail" aria-label="일자 이동">
+  <a href="#d1"><b>10/3 토</b><small>도착</small></a>
+  <a href="#d2" class="ky"><b>10/4 일</b><small>경마·요괴</small></a>
+  <a href="#d3" class="ky"><b>10/5 월</b><small>교토 동부</small></a>
+  <a href="#d4"><b>10/6 화</b><small>아라시야마</small></a>
+  <a href="#d5" class="ky"><b>10/7 수</b><small>USJ</small></a>
+  <a href="#d6"><b>10/8 목</b><small>우메다</small></a>
+  <a href="#d7"><b>10/9 금</b><small>피규어·게임</small></a>
+  <a href="#d8"><b>10/10 토</b><small>귀국</small></a>
+  <a href="#todo"><b>할 일</b><small>데드라인</small></a>
+  <a href="#pool"><b>예비</b><small>비·밤·회복</small></a>
+</nav>
+
+<section class="todo" id="todo">
+  <h2>출발 전 처리 순서</h2>
+  <ol>
+    <li class="done">항공 — 파라타 WE513/WE514 발권 완료 (9/8)</li>
+    <li><b class="d">지금</b> 숙소 3건 — 오사카 10/3 1박(<b>22시 이후 체크인 가능</b> 확인) · 교토 10/4~5 2박(체크아웃 후 짐 보관 가능 확인) · 오사카 10/6~9 4박 <span class="why">항공이 끝났으니 환불 불가 상품이어도 됨</span></li>
+    <li><b class="d">지금</b> USJ 10/7 스튜디오 패스 + 익스프레스 — 클룩 패스7 기준 1인 ₩251,800(9/8 조회), 공식 스토어엔 패스7 없음 <span class="why">닌텐도 월드 확약 포함이 핵심</span></li>
+    <li><b class="d">지금</b> 국제운전면허증 발급 <span class="why">닛폰바시 고카트 탑승 조건. 없으면 불가</span></li>
+    <li><b class="d">9/22 화 18:00 → 9/24 목 13:00</b> JRA 교토대상전 지정석 일반추첨 신청 (my.jra-tickets.jp, <b>사내 VPN 끄고</b>) — 1지망 A지정석 → 2지망 스마트시트 → 3지망 B지정석. 둘이 각자 계정으로 <span class="why">당선 시 9/25 18:00~9/27 13:00 결제 안 하면 무효 · 낙첨 시 9/28 18:00 잔석 선착 → 9/27 입장권 추첨 → 당일 ¥200</span></li>
+    <li><b class="d">9/25 금 12:00</b> 요괴축제 참가형 퍼레이드 신청 마감 (선택, 관람만이면 불필요) · 나이트권 ¥2,000은 온라인 사전구매</li>
+    <li><b class="d">10월 초</b> 포켓몬 카페 오사카(31일 전 추첨/선착) · 체인소맨 킷사 KITTE(사전예약제) · 아사히 맥주 뮤지엄 웹 예약 · 미나미호이루 1DAY PASS(D8 C안 택할 때)</li>
+    <li><b class="d">공통</b> Visit Japan Web · 모바일 ICOCA · 개인 카드로 결제(법인 마스터카드는 여행 프로모션 제외) · ¥1,000권 현금 넉넉히(다치노미·식권기)</li>
+  </ol>
+</section>
+
+<!-- D1 -->
+<article class="day" id="d1">
+  <div class="dayhead">
+    <div class="dnum"><small>D1 · 토</small>10/3</div>
+    <div class="dtitle"><h2>도착. 체크인하고 첫 잔만.</h2>
+      <div class="dmeta"><span class="pill stay">오사카 숙박</span><span class="pill">심야 도착</span><span class="pill warn">22시 이후 체크인 확인</span></div></div>
+  </div>
+  <div class="core"><span>22:00 체크인</span><span>늦은 저녁 1곳</span><em>그 이상 욕심내지 않는다</em></div>
+  <ul class="tl">
+    <li><span class="t">15:30</span>인천공항 도착 · 18:00 WE513 이륙</li>
+    <li class="key"><span class="t">19:55</span>KIX 착륙 → 입국·수하물 ~20:45 <span class="note">한국 연휴 첫날 출발분이라 입국장 혼잡 가능. +15분 여유</span></li>
+    <li><span class="t">21:00</span>난카이 라피트 → 21:40 난카이 난바 (약 40분, ¥1,500 안팎) <span class="alt">라피트 매진이면 공항급행 45분</span></li>
+    <li class="key"><span class="t">22:00</span>숙소 체크인 <span class="warn">프런트 운영시간·무인 체크인 방식 사전 확인. 도착 시각 미리 통보</span></li>
+    <li><span class="t">22:15</span>늦은 저녁 — 炭焼笑店 陽 난바점(야키토리, ~01:30, 무휴, 도보) <span class="alt">あたりや食堂 다치노미(~24:00) · 24h 라멘 · 편의점</span></li>
+    <li><span class="t">00:00</span>취침. D2는 09:15 체크아웃이라 여유 있음</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4><b>①</b> 저녁 외출 → 편의점으로 끝내도 D2에 영향 없음</div>
+    <div><h4>버려진 것</h4>난바 운카이(~22:00)는 시간상 불가 → D7 밤으로 이관. 10/3 당일 한정 사케 이벤트(하쿠츠루·히메지)는 저녁 도착으로 자동 탈락</div>
+  </div>
+</article>
+
+<!-- D2 -->
+<article class="day" id="d2">
+  <div class="dayhead">
+    <div class="dnum"><small>D2 · 일</small>10/4</div>
+    <div class="dtitle"><h2>교토대상전, 그리고 우즈마사 백귀야행.</h2>
+      <div class="dmeta"><span class="pill stay">교토 숙박 1일차</span><span class="pill ky">동행 링크 반영</span><span class="pill">둘 다 이날만 되는 것</span></div></div>
+  </div>
+  <div class="core"><span>15:30 교토대상전 GII</span><span>19:30 우즈마사 백귀야행</span><span>교토 체크인</span></div>
+  <ul class="tl">
+    <li><span class="t">09:15</span>오사카 체크아웃, 캐리어 동반 → 미도스지선 → 우메다</li>
+    <li><span class="t">09:30</span>한큐 특급 → <b>가와라마치 10:15</b> (¥410, 45분) <span class="alt">게이한 요도야바시 → 기온시조 55분</span></li>
+    <li><span class="t">10:30</span>교토 숙소에 짐 맡김(체크인 전 보관)</li>
+    <li class="key"><span class="t">10:45</span><b>아맘다코탄 교토</b>(中京区六角通室町東入骨屋町141, 니시키 도보 5분)에서 빵 → 니시키시장 한 바퀴. 빵은 경마장 도시락 <span class="note">줄 있음. 호불호 댓글도 있으니 기대치 중간</span> <span class="alt">숙소 근처 킷사텐 모닝</span></li>
+    <li><span class="t">12:45</span>게이한 기온시조 → 준급/급행 → <b>요도 13:15</b> <span class="note">특급은 요도 무정차. 단바바시 환승 or 급행 직행 25~30분. 개최일 임시 급행 증편</span></li>
+    <li><span class="t">13:30</span>입장(지정석 QR or 당일 ¥200) → 8R 13:40 리허설 → 파도크·터피숍·푸드코트(가라아게, 이치조지 레드에일) → 9R·10R 마권 ¥100씩</li>
+    <li class="key"><span class="t">15:30</span><b>11R 교토대상전</b> — 당첨이면 지정석, 낙첨이면 골 앞 에이프런 14:30부터 선점</li>
+    <li><span class="t">분기</span><b>ⓐ 참가형 퍼레이드에 행렬로 들어가면</b>(9/25 신청) 집합이 이르므로 11R 직후 <b>15:50 이탈</b> · <b>ⓑ 관람만이면</b> 12R 16:10 보고 <b>16:20 이탈</b>(역 혼잡 회피)</li>
+    <li><span class="t">이동</span>요도 → 게이한 → 산조 → 도자이선 산조게이한 → 우즈마사텐진가와 → 란덴 1정거장(or 도보 14분) → 영화촌, <b>약 60분</b> <span class="alt">택시 요도→우즈마사 30분 ¥4,000대. 둘이 나누면 시간 사는 값</span></li>
+    <li class="key"><span class="t">17:20</span>태진 영화촌 <b>나이트권 ¥2,000</b>(17:00~21:00) → 17:30 KAIKAI YOKAI PARADE(참가형) → 요괴 그리팅·푸드(야행동자 카쿠니만 ¥800) → <b>R-18 초한도박 + 어른 전용 고문저택</b> → <b>19:30 うずまさ百鬼夜行</b>(음악·댄스·殺陣)</li>
+    <li><span class="t">21:00</span>이탈 → 란덴 우즈마사코류지 → 시조오미야 → 도보/한큐 1정거장 → <b>21:30 교토 체크인</b> <span class="warn">22시 이후 체크인 가능 여부 예약 시 확인</span></li>
+    <li><span class="t">21:45</span>폰토초·기야마치 늦은 저녁 <span class="alt">편의점 + 숙소</span></li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4><b>①</b> 니시키 산책(빵만 사고 이동) → <b>②</b> 12R → <b>③</b> 17:30 참가형(19:30 본편만 사수). 코어 3개는 사수</div>
+    <div><h4>버퍼</h4>요도→우즈마사에 +30분이 이미 들어 있음. 진짜 데드라인은 19:30 하나. 우천 시 요괴축제는 진행, 경마 자유석은 실내 이동</div>
+    <div class="why"><h4>왜 이 카드인가 — 동행 근거</h4>요괴축제는 동행이 보낸 <a href="https://blog.naver.com/nicenomo/224398810778">네이버 블로그(트래블 에디트, 9/3)</a>가 출발점. 공식 특설 사이트로 교차검증: 퍼레이드는 토·일·祝만, 평일은 그리팅뿐, 10/6 화 휴촌. 아맘다코탄은 릴스 #8(<a href="https://www.instagram.com/p/DZ6_QfOzta_/">@today_dessert</a>, 좋아요 4,539). 영화촌 R-18 콘텐츠는 2026.3 리뉴얼 공식 릴리스</div>
+  </div>
+</article>
+
+<!-- D3 -->
+<article class="day" id="d3">
+  <div class="dayhead">
+    <div class="dnum"><small>D3 · 월</small>10/5</div>
+    <div class="dtitle"><h2>교토 동부. 아침에 이나리, 저녁에 폰토초.</h2>
+      <div class="dmeta"><span class="pill stay">교토 숙박 2일차</span><span class="pill ky">동행 릴스 반영</span><span class="pill">교토 숙박이라 첫차 불필요</span></div></div>
+  </div>
+  <div class="core"><span>후시미이나리 아침</span><span>기요미즈 + 산넨자카</span><span>기온 하나미코지</span></div>
+  <ul class="tl">
+    <li><span class="t">07:00</span>기상. 아침은 킷사텐 모닝(純喫茶アメリカン 도톤보리점은 오사카라 제외 → 숙소 근처 이노다 커피 등) or 편의점 <span class="note">교토 가게는 9시, 식당은 10~11시 오픈이라 미리 해결</span></li>
+    <li class="key"><span class="t">07:45</span>게이한 기온시조 → <b>후시미이나리역</b> → 요츠츠지 전망대까지 왕복(~09:45) <span class="alt">늦잠이면 루트 역전: 기요미즈 먼저, 이나리는 16:30 이후(인파 빠지고 등불)</span> <span class="alt">체력 아끼면 오모카루돌·본전권 45분</span></li>
+    <li><span class="t">10:00</span>게이한 → 기요미즈고조 → 도보 20분 <span class="alt">택시 ¥1,000대</span></li>
+    <li class="key"><span class="t">10:30</span>기요미즈데라(~¥500) → <b>산넨자카·니넨자카</b> <span class="alt">인파 심하면 입장 생략, 골목만</span></li>
+    <li><span class="t">12:00</span>점심 — 니넨자카·기온 소바·우동 (무예약 유연 슬롯)</li>
+    <li><span class="t">13:00</span>기온 하나미코지 → 가와라마치</li>
+    <li><span class="t">14:30</span><b>옵션 슬롯 택1</b> — ⓐ 후시미 사케 지구(게이한 츄쇼지마, 겟케이칸 기념관 시음 ¥3,000은 전일 예약, 야마자키 증류소 대체) ⓑ 난젠지 + 인클라인(기온에서 도보권) ⓒ 은각사·철학의 길 ⓓ 숙소 휴식</li>
+    <li><span class="t">17:00</span>폰토초 저녁 → 기야마치 바 <span class="alt">니시키 주전부리 + 편의점</span> <span class="note">USJ 전날이 아니므로 시간 제약 없음</span></li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4><b>①</b> 옵션 슬롯 → <b>②</b> 폰토초(숙소 근처 이자카야로 격하). 코어 3개 사수</div>
+    <div><h4>휴무 체크</h4>10/5 월 휴무는 오사카 쪽(노무손 카레, KAGAMI+)이라 교토 일정엔 영향 없음</div>
+    <div class="why"><h4>왜 이 카드인가 — 동행 근거</h4>릴스 #7 <a href="https://www.instagram.com/p/DaKsBk9B2Gw/">@hongsue_</a>(좋아요 8,185) "07:20 니넨자카가 텅 빔" → 아침 승부 근거. 릴스 #6 <a href="https://www.instagram.com/p/Da0RodqRg41/">@younipie</a> 교토 14곳 중 니넨자카·기요미즈·후시미이나리가 코어와 일치, 난젠지·인클라인을 옵션에 추가. 릴스 #1 <a href="https://www.instagram.com/p/Dc_ErDnTaDh/">@ju_ulip</a>의 오하라 산젠인은 외곽(편도 1h)이라 이번엔 제외</div>
+  </div>
+</article>
+
+<!-- D4 -->
+<article class="day" id="d4">
+  <div class="dayhead">
+    <div class="dnum"><small>D4 · 화</small>10/6</div>
+    <div class="dtitle"><h2>아라시야마 아침, 오사카로 복귀.</h2>
+      <div class="dmeta"><span class="pill stay">오사카 숙박 시작</span><span class="pill warn">화요일 휴무: 영화촌·닌텐도 뮤지엄</span><span class="pill">USJ 전날 → 22시 취침</span></div></div>
+  </div>
+  <div class="core"><span>대나무숲 9시 전</span><span>15:00 오사카 체크인</span><span>우라난바 첫 밤</span></div>
+  <ul class="tl">
+    <li><span class="t">07:30</span>체크아웃. <b>짐은 교토 숙소 보관</b>(체크아웃 후 보관 가능 여부 예약 시 확인) <span class="alt">한큐 가와라마치역 코인로커</span></li>
+    <li class="key"><span class="t">08:00</span>한큐 가와라마치 → 가쓰라 환승 → <b>아라시야마 08:30</b> → 대나무숲(9시 전 승부) → 도게츠교 강변</li>
+    <li><span class="t">09:30</span>텐류지 정원 or 몽키파크 택1 <span class="alt">강변 카페</span> <span class="note">사가노 토롯코(예약제, +1h)는 시간 되면. 동행 릴스 #6 추천</span></li>
+    <li><span class="t">11:00</span>아라시야마 상점가 점심(두부·소바) <span class="alt">우메다 도착 후 점심</span></li>
+    <li><span class="t">12:15</span>아라시야마 → 가쓰라 → 가와라마치 13:00 → 짐 회수</li>
+    <li class="key"><span class="t">13:30</span>한큐 가와라마치 → 오사카우메다 14:15 → 미도스지선 → 난바 → <b>15:00 오사카 체크인</b> <span class="note">금각사 추가 시 +2h → 체크인 17:00. 컷 1순위</span></li>
+    <li><span class="t">15:00</span>휴식·짐 정리·USJ 앱 세팅(e정리권용 계정)</li>
+    <li class="key"><span class="t">17:00</span><b>우라난바 풀코스</b> — 魚屋ひでぞう(사시미, 14~23:30) → スタンドにしき(오일통 키마카레 ¥770, 17~23:30) → あたりや食堂(활전복 ¥750, ~24:00) <span class="alt">텐마 센베로(우메다 경유)</span> <span class="alt">비 오면 라운드원 스포차(24h)</span></li>
+    <li><span class="t">22:00</span>취침. 내일 06:30 기상</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4><b>①</b> 금각사 → <b>②</b> 텐류지/몽키파크 → <b>③</b> 아라시야마 점심</div>
+    <div><h4>휴무 체크</h4>화요일: 태진 영화촌·닌텐도 뮤지엄·アンケラソ·千日前シアター·IL PIATTO. 위 코스엔 미포함. 히데조우는 수요일 휴무라 오늘은 OK</div>
+  </div>
+</article>
+
+<!-- D5 -->
+<article class="day" id="d5">
+  <div class="dayhead">
+    <div class="dnum"><small>D5 · 수</small>10/7</div>
+    <div class="dtitle"><h2>USJ. 낮엔 호러 어트랙션, 18시부터 좀비.</h2>
+      <div class="dmeta"><span class="pill stay">오사카</span><span class="pill ky">동행 릴스 반영</span><span class="pill ok">공식 운영 08:00~22:00</span></div></div>
+  </div>
+  <div class="core"><span>07:45 게이트</span><span>익스프레스 시간표가 뼈대</span><span>18:00~ 할로윈 호러 나이트</span></div>
+  <ul class="tl">
+    <li><span class="t">06:30</span>기상 → 07:00 출발 (닛폰바시 → 니시쿠조 환승 → JR 유니버설시티, ~35분)</li>
+    <li class="key"><span class="t">07:45</span>게이트 앞. 표기 개장 08:00, 조기 개장 관행 <span class="note">개막 주말(9/11) 릴스에서 "익스프레스 있어도 대기 김" → 평일이어도 오픈런 유지</span></li>
+    <li><span class="t">08:00</span>입장 → 플라잉 다이너소어 첫 타 → 닌텐도 월드(마리오카트·동키콩 확약 시간) → <b>사다코의 저주·체인소맨 4-D는 오픈부터 운영 → 해 지기 전에</b> · 바이오하자드 더 다이브는 앱 e정리권(패스 대응) · 잔상(R-18)은 별도 ¥1,900 사전구매 시에만</li>
+    <li><span class="t">낮</span>세부 동선은 동행 위임(익스프레스 시간표 기준). 파크 내 식사는 기대치 조절</li>
+    <li class="key"><span class="t">18:00</span><b>스트리트 좀비</b> 출몰 → <b>HHN 아카데미 ~절규의 15년~</b>(그래머시 파크, 회차는 1주 전 쇼 스케줄) → 좀비 바로 변신한 워프 카페 → 백드롭 BGM은 Rat-tat-tat 기간(~10/10)</li>
+    <li><span class="t">22:00</span>폐장 → 22:45 역 → 23:20 숙소 → 취침. D6는 늦잠 허용</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4>익스프레스 미포함 라이드부터 버린다. 18시 이후 콘텐츠는 사수(이날의 이유)</div>
+    <div><h4>휴무·주의</h4>히데조우 수요일 휴무(무관). USJ 운영시간은 방문 1주 전 공식 캘린더 재확인. 방문일 백드롭은 Rat-tat-tat, Ado는 10/11부터</div>
+    <div class="why"><h4>왜 이 순서인가 — 동행 근거</h4>릴스 #4 <a href="https://www.instagram.com/p/DdJCgd5k5bA/">@_tripgoing</a> 현장 리포트(사다코·체인소맨은 낮에, 18시부터 좀비·아카데미)를 운용 순서로 채택. 릴스 #5 <a href="https://www.instagram.com/p/DdJLol3zZUh/">@_onyour_</a> 개막일 인파 영상이 오픈런·익스프레스 근거. 상세 콘텐츠 16종 표는 <a href="https://noone-is-hier.github.io/kansai-trip/">도감</a>의 USJ 카드</div>
+  </div>
+</article>
+
+<!-- D6 -->
+<article class="day" id="d6">
+  <div class="dayhead">
+    <div class="dnum"><small>D6 · 목</small>10/8</div>
+    <div class="dtitle"><h2>우메다 라인. 오사카가 비는 날을 실내로 채운다.</h2>
+      <div class="dmeta"><span class="pill stay">오사카</span><span class="pill warn">목요일 휴무: 오하기·아카가키야·니시키</span><span class="pill">늦잠 허용</span></div></div>
+  </div>
+  <div class="core"><span>LUCUA SOUTH 13F</span><span>영국페어 브리티시 펍</span><span>체인소맨 킷사 개점일</span></div>
+  <ul class="tl">
+    <li><span class="t">10:00</span>기상 → 신파치 식당 아침(생맥 ¥176, 07시~) or 킷사텐 <span class="alt">기즈 시장 카이센동(도보 10분)</span></li>
+    <li class="key"><span class="t">11:30</span>미도스지선 → 우메다 → <b>LUCUA SOUTH 13F 캐릭터즈 월드</b>(2026.4 개업) — 포켓몬센터 오사카·닌텐도 오사카·캡콤 스토어&카페·원피스 무기와라 스토어가 한 층. 10:00~20:00 <span class="warn">다이마루 우메다 13F는 옛 정보. 이전했음</span></li>
+    <li><span class="t">13:00</span>타임아웃 마켓 오사카(그란그린, 아시아 1호점, 17개 점포 + 바 2) 점심</li>
+    <li class="key"><span class="t">14:30</span><b>한큐 우메다 영국페어</b>(10/7~12, 입장 무료) — 9F <b>브리티시 펍&바</b> + 피시앤칩스 <span class="alt">우메다 로프트(단간론파×산리오, 하이큐)</span></li>
+    <li><span class="t">16:00</span><b>체인소맨 킷사</b> @ BOX cafe KITTE 오사카 6F(오늘 개점, 사전예약제) <span class="alt">예약 못 하면 캡콤카페 우메다(ESTHER BUNNY 콜라보 오늘까지)</span></li>
+    <li><span class="t">18:00</span>저녁 택1 — ⓐ 텐마 센베로(코바야시 쇼텐·타지마야) ⓑ <b>스키마스위치 @ 고베국제회관</b>(18:30, 입견 ¥8,500, 산노미야 환승 없이 40분) ⓒ 벨기에 비어 위켄드 교토(오늘 개막, 교토역 5분)</li>
+    <li><span class="t">21:00</span>난바 복귀 → <b>난바 운카이 슈퍼운카이</b>(난바파크스, 무료) → 숙소</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>대안 일정</h4>이 날을 <b>고베 + 아리마</b>(有馬・六甲周遊 1day 한신판 ¥3,000, 스테이크랜드 11시 오픈런, 로프웨이 15:00)로 통째 교체 가능. 그러면 우메다 라인은 D7 오전으로 압축</div>
+    <div><h4>휴무 체크</h4>목요일: 玉製家(오하기)·赤垣屋(둘째·셋째 목)·スタンドにしき·フィメール. 교토 만화뮤지엄은 수요일 휴관이라 무관</div>
+  </div>
+</article>
+
+<!-- D7 -->
+<article class="day" id="d7">
+  <div class="dayhead">
+    <div class="dnum"><small>D7 · 금</small>10/9</div>
+    <div class="dtitle"><h2>피규어 순례와 아메무라 게임 콤보.</h2>
+      <div class="dmeta"><span class="pill stay">오사카</span><span class="pill">전부 실내 · 우천 무적</span><span class="pill ky">동행 위시리스트</span></div></div>
+  </div>
+  <div class="core"><span>덴덴타운</span><span>히로아카 10주년 팝업 개점일</span><span>핀볼 120대</span></div>
+  <ul class="tl">
+    <li class="key"><span class="t">10:00</span><b>덴덴타운·오타로드</b>(숙소 도보) — 슈퍼키즈랜드 본점, 슈퍼포테토, 만다라케 · <b>오리파 카드샵</b>(카드라보 오타로드 본점, Bee本舗 배틀타워) · 가샤폰 백화점 난바파크스점 <span class="note">면세 카운터 활용, 캐리어 공간 확보</span></li>
+    <li><span class="t">12:30</span>점심 — 샨카라도 난바(스파이스카레, 긴테츠 오사카난바역 구내) or 総大醤(야키메시+쇼유라멘, 텐진바시6초메, 통영업)</li>
+    <li class="key"><span class="t">14:00</span>우메다 → <b>히로아카 애니 10주년 bones store 팝업</b>(우메다PACKS 애니메이트 내, 오늘 개점 11:00~21:00, 무료) — 10주년 기념 피규어 23체 프로젝트 <span class="alt">LUCUA SOUTH 재방문(D6에 못 산 것)</span></li>
+    <li class="key"><span class="t">16:00</span>아메무라 <b>Silver Ball Planet</b>(빅스텝 3F, 빈티지 핀볼 ~120대, 1플레이 ¥100) → 호리에·아메무라 빈티지</li>
+    <li><span class="t">18:30</span>저녁 택1 — ⓐ <b>츠루하시 야키니쿠</b>(난바 15분, 코리아타운) ⓑ 자우오 난바(낚시 이자카야, 4인 조건 확인) ⓒ 자우라(신카부키자 뒤편, 카이조쿠 굴 주전자 구이)</li>
+    <li><span class="t">21:00</span><b>난바 운카이</b>(D1에서 이관) → <b>Space Station</b> 레트로 게임바(N64·메가드라이브 무료, 영어 OK) → 우라난바 마무리</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4><b>①</b> 히로아카 팝업(우메다 왕복 1h 절약) → <b>②</b> 핀볼. 덴덴타운은 사수</div>
+    <div><h4>이 날의 대안 카드</h4><b>아마노하시다테·이네후나야 버스투어</b>(라쿠투어 57,133원, 07:40 닛폰바시 츠루동탄 앞 집결, 18:00 복귀, 최소 10명, 3일 전부터 환불 불가) — 동행이 제안한 상품. 넣으면 피규어 순례는 D6 오전·D8 오전으로 분산. 매일 출발이라 경마와 양자택일 아님. 아사히 맥주 뮤지엄(스이타, 90분 투어 + 시음 2잔 ¥1,000, 웹 예약)도 이 날 오전 후보</div>
+    <div class="why"><h4>왜 이 카드인가 — 동행 근거</h4>피규어 순례는 동행 위시리스트. 아마노하시다테는 동행이 보낸 <a href="https://experiences.myrealtrip.com/products/3153608">마이리얼트립 상품</a>. 같은 코스가 43,000원대에도 있으나 라쿠투어는 후기 729개·확정률 프리미엄. 릴스 #3 <a href="https://www.instagram.com/p/Dc2DGosk1DN/">@sweet_mr.kang</a>의 JR 가을 무제한 패스(¥7,850, 3일 연속, 10/3~18)는 우리가 사철 위주라 미채택</div>
+  </div>
+</article>
+
+<!-- D8 -->
+<article class="day" id="d8">
+  <div class="dayhead">
+    <div class="dnum"><small>D8 · 토</small>10/10</div>
+    <div class="dtitle"><h2>짐 맡기고 낮을 다 쓴 뒤, 16:30 라피트.</h2>
+      <div class="dmeta"><span class="pill stay">귀국 · WE514 20:55</span><span class="pill warn">일본 3연휴 첫날 · 공항 혼잡</span><span class="pill">가용 11:00~16:00</span></div></div>
+  </div>
+  <div class="core"><span>16:30 난카이 난바 라피트</span><span>18:30 KIX 도착</span><em>이 둘만 지키면 낮은 자유</em></div>
+  <ul class="tl">
+    <li><span class="t">08:30</span>기상 → <b>기즈 시장 아침</b>(도보 10분, 카이센동, 병설 센토 太平のゆ) <span class="alt">赤垣屋 아침술(토 10:00~) · 신파치 07:00</span></li>
+    <li><span class="t">10:30</span>체크아웃 → <b>난카이 난바역 코인로커</b>(대형 ¥700~1,000) <span class="warn">레드루프는 체크아웃 후 13시까지만 보관 → 불가. 기시와다역 로커는 축제일 만실 리스크</span></li>
+    <li class="key"><span class="t">11:00</span><b>A안 · 기시와다 단지리 10월제례 요이미야</b> — 난카이 급행 25분 → 기시와다. 10월제례는 시가지가 아닌 야마테 6지구(東岸和田 등) 논밭 질주. 난카이 기시와다 하차 후 택시/버스 or 도보 20~30분. 무료·예약 불필요. 야리마와시 코너는 통제선 밖에서 <span class="note">06:00 히키다시(새벽 제등 출발)까지 보려면 05:00 난바 출발 → 08:00 복귀 → 위 일정 그대로. 체력 여유 있을 때만</span></li>
+    <li><span class="t">B안</span>세레소 오사카 vs 요코하마F마리노스 14:00 @ 얀마 하나사카(난바 25분). 종료 16:00 → 여유 0, 후반 포기 각오</li>
+    <li><span class="t">C안</span><b>미나미 호이루</b> 낮 무대(신사이바시~난바 라이브하우스 20곳, 1DAY PASS 사전구매 필수). 이동 0, 가장 안전</li>
+    <li><span class="t">D안</span>비 오면 라운드원 스포차 or DESSE 사우나 → 15:00 우라난바 마지막 잔</li>
+    <li><span class="t">15:00</span>난바 복귀 → 짐 회수 → 돈키호테 마지막 쇼핑(24h)</li>
+    <li class="key"><span class="t">16:30</span><b>라피트</b> → 17:10 KIX → 체크인·면세 <span class="note">3연휴 첫날이라 17:00 대신 30분 당김</span></li>
+    <li class="key"><span class="t">20:55</span>WE514 이륙 → 22:55 인천</li>
+  </ul>
+  <div class="foot">
+    <div class="cut"><h4>컷 순서</h4>낮 일정 전체가 컷 대상. <b>16:30 라피트만 절대선</b></div>
+    <div><h4>이날만 되는 것들 (참고)</h4>기시와다 요이미야 · 오츠마츠리 요이미야 · 고베 재즈스트리트 · JRA 교토 고료S · 교토 온가쿠하쿠 · CS 1스테이지 개막(한신 2위 시 고시엔). 전부 오후~밤이라 우리는 낮 구간만 걸침</div>
+  </div>
+</article>
+
+<!-- 예비 -->
+<section class="sec" id="pool">
+  <h2>예비 카드 풀</h2>
+  <p class="lede">일정이 붕 뜨거나 비가 오거나 술을 너무 마셨을 때. 전부 예약 불필요, 숙소(난바·닛폰바시) 도보~15분.</p>
+  <div class="pool">
+    <div><h3>비 오는 날</h3><ul><li>라운드원 스포차 센니치마에 — 24h, 90분 ¥2,190~</li><li>카이유칸 — 츄오선 오사카코, ~¥2,700</li><li>교토 철도박물관 — 우천 카드 2호(교토 체류 시)</li><li>LUCUA SOUTH·덴덴타운은 원래 실내</li></ul></div>
+    <div><h3>밤 · 술</h3><ul><li>우라난바 7선: 陽(7~11시·15~01:30) / あたりや / ひでぞう(수 휴) / にしき(목 휴) / 丑寅 / 赤垣屋(둘째·셋째 목 휴, 10시~) / 生ホルモンいただき</li><li>자우라 — 신카부키자 뒤 삼각지대, PIENO·貝賊</li><li>오하츠텐진 우라산도(히가시우메다) — 을지로 노가리 골목 포지션</li><li>텐마: 小林商店·田島屋(10시~)·こぶき司 나다레즈시 ¥1,980</li><li>토리사케 난바 — 생맥 ¥299, 일~목 노미호다이 ¥980(타베로그 예약, SNS 단일 소스라 조건 재확인)</li></ul></div>
+    <div><h3>회복 · 사우나</h3><ul><li>DESSE(신사이바시 3분) — 8종 사우나, 11:00~익일 09:00. 요금·성별 운영은 소스 불일치라 현장 확인</li><li>아무자(Amza) 난바 — 남성 전용, 12:00~익일 10:00, <b>캡슐 숙박 가능</b></li><li>그랜드사우나 심사이바시 — 24h, 남성 전용</li><li>스파월드(신세카이) — 10:00~익일 08:45, 와그 8,921원~</li></ul></div>
+    <div><h3>아침</h3><ul><li>신파치 식당 난바난카이도오리 — 07:00, 생맥 ¥176 + 숯불 생선 정식</li><li>炭焼笑店 陽 — 07:00~11:00 아침 영업</li><li>기즈 도매시장 — 카이센동 + 太平のゆ, 도보 10분</li><li>회즈야(아이즈야) 난바점 — 소스 없는 원조 타코야키, 6개 ¥650, 난바역 지하</li></ul></div>
+    <div><h3>짧게 한 컷</h3><ul><li>난바 야사카 신사 사자전 — 무료, 6:30~17:00, 도보 7분</li><li>츠텐카쿠 타워 슬라이더 — ¥1,000, 주유패스 무료</li><li>난바 운카이 — 매일 17:30~22:00, 21:00 슈퍼운카이</li><li>고카트(닛폰바시 출발, 국제면허 필수) — 1h 코스, 도톤보리·오사카성 주행</li></ul></div>
+    <div><h3>이번엔 안 되는 것</h3><ul><li>야구 — 10/4~9 간사이 홈경기 0, CS는 귀국일</li><li>야마자키 증류소 — 10월분 추첨 마감</li><li>닌텐도 뮤지엄 — 10월분 추첨 마감, 취소분 선착만</li><li>스모·시라카와고 당일치기·엑스포 유산 — 없음</li><li>9월 한정 간식(배라×밀키, 츠키미) — 종료</li></ul></div>
+  </div>
+</section>
+
+<!-- 공통 -->
+<section class="sec">
+  <h2>공통 정보</h2>
+  <div class="pool">
+    <div><h3>교통</h3><dl class="kv">
+      <dt>KIX ↔ 난바</dt><dd>난카이 라피트 35~40분 ¥1,500 안팎 (공항급행 45분, 운임만)</dd>
+      <dt>난바 ↔ 교토</dt><dd>한큐 우메다↔가와라마치 특급 45분 ¥410 / 게이한 요도야바시↔기온시조 55분</dd>
+      <dt>기온시조 ↔ 요도</dt><dd>게이한 준급·급행 25~30분. 특급 무정차</dd>
+      <dt>우즈마사</dt><dd>란덴 太秦広隆寺 도보 5분 / 지하철 太秦天神川 14분</dd>
+      <dt>난바 ↔ 기시와다</dt><dd>난카이 급행 25분(라피트 무정차)</dd>
+      <dt>USJ</dt><dd>닛폰바시 → 니시쿠조 → JR 유니버설시티 ~35분</dd>
+    </dl></div>
+    <div><h3>결제 · 앱</h3><dl class="kv">
+      <dt>현금</dt><dd>다치노미·식권기·마권·요괴축제 푸드 → ¥1,000권 넉넉히</dd>
+      <dt>카드</dt><dd>개인 카드. 법인 마스터카드는 여행 프로모션 제외</dd>
+      <dt>USJ 앱</dt><dd>e정리권(바이오하자드·KATE)·대기시간. 도착 전 계정</dd>
+      <dt>JRA 넷예약</dt><dd>my.jra-tickets.jp. 사내 VPN 켜면 차단. 동행자 QR은 "チケット分配"로 사전 송신</dd>
+      <dt>주유패스</dt><dd>2026년부터 전자 QR 전용. 스크린샷 불가, 카메라 권한 필요</dd>
+    </dl></div>
+    <div><h3>요일 휴무 한눈에</h3><dl class="kv">
+      <dt>10/4 일</dt><dd>玉製家</dd>
+      <dt>10/5 월</dt><dd>노무손 카레 · KAGAMI+(VS.) · 旬の揚てんma</dd>
+      <dt>10/6 화</dt><dd><b>영화촌 · 닌텐도 뮤지엄</b> · アンケラソ · 千日前シアター</dd>
+      <dt>10/7 수</dt><dd>魚屋ひでぞう · 교토 만화뮤지엄</dd>
+      <dt>10/8 목</dt><dd>玉製家 · 赤垣屋 · スタンドにしき</dd>
+      <dt>무휴</dt><dd>炭焼笑店 陽 · あたりや · 丑寅 · DESSE · 스파월드</dd>
+    </dl></div>
+    <div><h3>짐 전략</h3><dl class="kv">
+      <dt>D2 아침</dt><dd>오사카 체크아웃 → 캐리어 들고 한큐 → 교토 숙소 선보관</dd>
+      <dt>D4 아침</dt><dd>교토 체크아웃 → 숙소 보관 → 아라시야마 → 회수 → 오사카</dd>
+      <dt>D8</dt><dd>난카이 난바역 코인로커. 호텔 보관은 13시 마감 가능성</dd>
+      <dt>쇼핑</dt><dd>D7 피규어 순례 뒤 캐리어 여유 필요. 위탁 수하물 규정 사전 확인</dd>
+    </dl></div>
+  </div>
+</section>
+
+<!-- 근거 색인 -->
+<section class="sec">
+  <h2>동행이 보낸 것들 — 어디에 반영됐나</h2>
+  <p class="lede">정찬이 DM으로 보낸 릴스 8개와 링크 2개. 버리지 않고 각 날짜에 배치한 결과. 노란 태그가 붙은 날이 이 목록에서 온 카드.</p>
+  <div class="tscroll"><table>
+    <tr><th>#</th><th>출처</th><th>내용</th><th>반영</th></tr>
+    <tr><td class="mono">1</td><td><a href="https://www.instagram.com/p/Dc_ErDnTaDh/">@ju_ulip</a></td><td>24시간 교토 루트(광고). 오하라 산젠인, 다도, 라쿠사이 죽림공원</td><td>외곽이라 미채택. D3 옵션 후보로만</td></tr>
+    <tr><td class="mono">2</td><td><a href="https://www.instagram.com/p/DdBRfggkiiV/">@true_eating</a></td><td>9월 일본 신상 간식(배라×밀키 9/1~30, 맥날 츠키미)</td><td>9월 한정 → 종료. 미채택</td></tr>
+    <tr><td class="mono">3</td><td><a href="https://www.instagram.com/p/Dc2DGosk1DN/">@sweet_mr.kang</a></td><td>JR 가을 무제한 패스 ¥7,850, 연속 3일, 사용 10/3~18, 보통·쾌속만</td><td>날짜는 겹치나 사철 위주라 미채택. 히메지 부활 시 재검토</td></tr>
+    <tr><td class="mono">4</td><td><a href="https://www.instagram.com/p/DdJCgd5k5bA/">@_tripgoing</a></td><td>USJ 할로윈 현장 리포트. 사다코·체인소맨은 낮, 18시부터 좀비·아카데미</td><td><b>D5 운용 순서로 채택</b></td></tr>
+    <tr><td class="mono">5</td><td><a href="https://www.instagram.com/p/DdJLol3zZUh/">@_onyour_</a></td><td>9/11 USJ 개막일 실시간, 인파 매우 많음</td><td>D5 오픈런·익스프레스 근거</td></tr>
+    <tr><td class="mono">6</td><td><a href="https://www.instagram.com/p/Da0RodqRg41/">@younipie</a></td><td>교토 14곳 추천</td><td>D3·D4 코어와 일치. 난젠지+인클라인 옵션 추가, 사가노 토롯코 D4 후보</td></tr>
+    <tr><td class="mono">7</td><td><a href="https://www.instagram.com/p/DaKsBk9B2Gw/">@hongsue_</a></td><td>교토는 아침에. 07:20 니넨자카</td><td><b>D3 설계 근거</b>. 가게 9시·식당 10~11시 오픈 → 아침 선해결</td></tr>
+    <tr><td class="mono">8</td><td><a href="https://www.instagram.com/p/DZ6_QfOzta_/">@today_dessert</a></td><td>아맘다코탄 교토 베이커리</td><td><b>D2 브런치 슬롯</b> + 경마장 도시락</td></tr>
+    <tr><td class="mono">L1</td><td><a href="https://experiences.myrealtrip.com/products/3153608">마이리얼트립</a></td><td>아마노하시다테·이네후나야 버스투어(라쿠투어 57,133원, 07:40 닛폰바시 집결)</td><td>D7 대안 카드. 경마와 양자택일 아님(매일 출발)</td></tr>
+    <tr><td class="mono">L2</td><td><a href="https://blog.naver.com/nicenomo/224398810778">네이버 블로그</a></td><td>교토 요괴축제 백귀야행</td><td><b>D2 저녁 코어</b>. 공식으로 검증: 토·일만 퍼레이드, 10/6 휴촌</td></tr>
+  </table></div>
+</section>
+
+<footer>
+  v3.1 · 2026-09-13 · 요금·운영시간은 예약 시점에 공식 링크로 재확인 · 팩트 원본과 조사 이력은 <a href="https://github.com/noone-is-hier/kansai-trip/blob/main/NOTES.md">NOTES.md</a> · 후보 카드 39장은 <a href="https://noone-is-hier.github.io/kansai-trip/modules.html">모듈 도감</a> · 기간·배치 논의는 <a href="https://noone-is-hier.github.io/kansai-trip/">옵션 보드</a>
+</footer>
+</div>
+
+</body>
+</html>
